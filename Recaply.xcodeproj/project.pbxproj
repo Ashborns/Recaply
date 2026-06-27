@@ -21,12 +21,15 @@
 		D5119D29420C49D1E25D9AD2 /* SessionTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23670D7271693A50B21074D8 /* SessionTag.swift */; };
 		7310142B04896DC4B5D59C00 /* SummaryPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF926B0086F0F4BE70E8744 /* SummaryPayload.swift */; };
 		049D92AC2A8BE5B21AB6D597 /* TranscriptSegmentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */; };
+		4671EEDFBF46687F598BEDAE /* ActionItemClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97DB6982051E7D971BA7800 /* ActionItemClassifier.swift */; };
 		CEBA8B8D94A3C77BDC251E9D /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4DF08E57C6D9C96C8705BE /* CameraService.swift */; };
+		1AF31E291BECB0E1FDE47AB7 /* ClassificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4A09305EA07690CAA7C8F0 /* ClassificationService.swift */; };
 		877ACC8D64FC8D324D746CE5 /* RecordingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A463B016C1E1B3C027D4B983 /* RecordingService.swift */; };
 		F1640355595C3C1646C61726 /* TranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2404482CB894185B5103E77 /* TranscriptionService.swift */; };
 		7DB5ADC34DA195AB15A6F5F9 /* RecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D84DCABFB8AAABA2FAEB87F3 /* RecordView.swift */; };
 		D29C8031F18919F35F8A080D /* RecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF9E5C29EE2F5A675869A3A /* RecordViewModel.swift */; };
 		13703A45F7E722622E632A64 /* Recaply.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */; };
+		FD25F60E4BBC8658276540BC /* ClassificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32BBA627F419C9029445858E /* ClassificationServiceTests.swift */; };
 		179782633F55D14071133A6E /* RecaplyTestsPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */; };
 		FFB405A883222D6DE42D220B /* RecordViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B4049CB72409F585A39A51 /* RecordViewModelTests.swift */; };
 		E58F7A5734D579D112036679 /* TranscriptSegmenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C342237082EEB1135F2EA7A /* TranscriptSegmenterTests.swift */; };
@@ -49,12 +52,15 @@
 		23670D7271693A50B21074D8 /* SessionTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionTag.swift"; sourceTree = "<group>"; };
 		7BF926B0086F0F4BE70E8744 /* SummaryPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SummaryPayload.swift"; sourceTree = "<group>"; };
 		900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TranscriptSegmentModel.swift"; sourceTree = "<group>"; };
+		F97DB6982051E7D971BA7800 /* ActionItemClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionItemClassifier.swift"; sourceTree = "<group>"; };
 		2B4DF08E57C6D9C96C8705BE /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CameraService.swift"; sourceTree = "<group>"; };
+		6D4A09305EA07690CAA7C8F0 /* ClassificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ClassificationService.swift"; sourceTree = "<group>"; };
 		A463B016C1E1B3C027D4B983 /* RecordingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordingService.swift"; sourceTree = "<group>"; };
 		B2404482CB894185B5103E77 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TranscriptionService.swift"; sourceTree = "<group>"; };
 		D84DCABFB8AAABA2FAEB87F3 /* RecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordView.swift"; sourceTree = "<group>"; };
 		4EF9E5C29EE2F5A675869A3A /* RecordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordViewModel.swift"; sourceTree = "<group>"; };
 		56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Recaply.xcdatamodeld"; sourceTree = "<group>"; };
+		32BBA627F419C9029445858E /* ClassificationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ClassificationServiceTests.swift"; sourceTree = "<group>"; };
 		C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecaplyTestsPlaceholder.swift"; sourceTree = "<group>"; };
 		04B4049CB72409F585A39A51 /* RecordViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordViewModelTests.swift"; sourceTree = "<group>"; };
 		2C342237082EEB1135F2EA7A /* TranscriptSegmenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TranscriptSegmenterTests.swift"; sourceTree = "<group>"; };
@@ -156,7 +162,9 @@
 		8D82EFA3D0D2E373AF7DB1A7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				F97DB6982051E7D971BA7800 /* ActionItemClassifier.swift */,
 				2B4DF08E57C6D9C96C8705BE /* CameraService.swift */,
+				6D4A09305EA07690CAA7C8F0 /* ClassificationService.swift */,
 				A463B016C1E1B3C027D4B983 /* RecordingService.swift */,
 				B2404482CB894185B5103E77 /* TranscriptionService.swift */,
 			);
@@ -191,6 +199,7 @@
 		997A1CCDE84C340F67A728AA /* RecaplyTests */ = {
 			isa = PBXGroup;
 			children = (
+				32BBA627F419C9029445858E /* ClassificationServiceTests.swift */,
 				C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */,
 				04B4049CB72409F585A39A51 /* RecordViewModelTests.swift */,
 				2C342237082EEB1135F2EA7A /* TranscriptSegmenterTests.swift */,
@@ -236,7 +245,9 @@
 				D5119D29420C49D1E25D9AD2 /* SessionTag.swift in Sources */,
 				7310142B04896DC4B5D59C00 /* SummaryPayload.swift in Sources */,
 				049D92AC2A8BE5B21AB6D597 /* TranscriptSegmentModel.swift in Sources */,
+				4671EEDFBF46687F598BEDAE /* ActionItemClassifier.swift in Sources */,
 				CEBA8B8D94A3C77BDC251E9D /* CameraService.swift in Sources */,
+				1AF31E291BECB0E1FDE47AB7 /* ClassificationService.swift in Sources */,
 				877ACC8D64FC8D324D746CE5 /* RecordingService.swift in Sources */,
 				F1640355595C3C1646C61726 /* TranscriptionService.swift in Sources */,
 				7DB5ADC34DA195AB15A6F5F9 /* RecordView.swift in Sources */,
@@ -248,6 +259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD25F60E4BBC8658276540BC /* ClassificationServiceTests.swift in Sources */,
 				179782633F55D14071133A6E /* RecaplyTestsPlaceholder.swift in Sources */,
 				FFB405A883222D6DE42D220B /* RecordViewModelTests.swift in Sources */,
 				E58F7A5734D579D112036679 /* TranscriptSegmenterTests.swift in Sources */,
