@@ -110,11 +110,11 @@ struct RecordView: View {
             .padding(.vertical, 14)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.white.opacity(0.05))
+                    .fill(Color.glassFill)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(Color.white.opacity(0.09), lineWidth: 1)
+                    .stroke(Color.glassStroke, lineWidth: 1)
             )
     }
 
@@ -138,9 +138,13 @@ struct RecordView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color.white.opacity(0.09), lineWidth: 1)
+                .stroke(Color.glassStroke, lineWidth: 1)
         )
+        // Lock the toggle to idle: flipping camera mid-recording would leak the
+        // session / orphan the mp4 (stop while "on" but never started, or vice versa).
+        .disabled(vm.phase != .idle)
         .opacity(vm.phase != .idle ? 0.6 : 1)
+        .accessibilityLabel("Camera")
     }
 
     // MARK: - Actions
@@ -149,10 +153,13 @@ struct RecordView: View {
         switch vm.phase {
         case .idle:
             haptic(.medium)
-            do {
-                try vm.start(tag: vm.tag, title: vm.title)
-            } catch {
-                vm.startError = friendlyStartError(error)
+            // `start` is async (camera config suspends off the main thread).
+            Task {
+                do {
+                    try await vm.start(tag: vm.tag, title: vm.title)
+                } catch {
+                    vm.startError = friendlyStartError(error)
+                }
             }
         case .recording:
             haptic(.medium)
@@ -180,8 +187,18 @@ struct RecordView: View {
         }
     }
 
+    /// Distinguishes camera failures (authorization / configuration) from mic/engine
+    /// failures so the inline message points at the right Settings pane.
     private func friendlyStartError(_ error: Error) -> String {
-        "Couldn't start recording. Check microphone access in Settings."
+        switch error {
+        case CameraError.notAuthorized:
+            return "Camera access is required to record video."
+        case CameraError.configurationFailed:
+            return "Couldn't start the camera. Try again, or record audio only."
+        default:
+            // Mic session / engine / file write errors — surface the detail.
+            return "Couldn't start recording. Check microphone access in Settings. (\(error.localizedDescription))"
+        }
     }
 
     private func haptic(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
@@ -210,7 +227,7 @@ private struct TagSegmentedControl: View {
                 } label: {
                     Text(tag.rawValue.capitalized)
                         .font(.subheadline.weight(isSelected ? .semibold : .medium))
-                        .foregroundColor(isSelected ? .white : .textTertiary)
+                        .foregroundColor(isSelected ? .textPrimary : .textTertiary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                         .background {
@@ -232,7 +249,7 @@ private struct TagSegmentedControl: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.white.opacity(0.09), lineWidth: 1)
+                .stroke(Color.glassStroke, lineWidth: 1)
         )
         .animation(reduceMotion ? nil : .recaplySpring, value: selection)
     }
@@ -247,11 +264,11 @@ private struct WaveformView: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let barCount = 36
+    private static let barCount = 36
     /// Fixed per-bar envelope so the waveform breathes organically instead of rising
-    /// as a single uniform block.
-    private let envelope: [CGFloat] = {
-        (0..<36).map { i in
+    /// as a single uniform block. `static` so it is built once, not recomputed at 20Hz.
+    private static let envelope: [CGFloat] = {
+        (0..<Self.barCount).map { i in
             let a = sin(Double(i) * 1.7) * 0.5 + 0.5
             let b = sin(Double(i) * 0.6 + 1.3) * 0.5 + 0.5
             return CGFloat(0.35 + 0.65 * (a + b) * 0.5)
@@ -261,7 +278,7 @@ private struct WaveformView: View {
     var body: some View {
         GeometryReader { geo in
             HStack(alignment: .center, spacing: spacing(for: geo.size.width)) {
-                ForEach(0..<barCount, id: \.self) { i in
+                ForEach(0..<Self.barCount, id: \.self) { i in
                     Capsule(style: .continuous)
                         .fill(Color.accentGradient)
                         .frame(width: 4, height: barHeight(i))
@@ -275,14 +292,14 @@ private struct WaveformView: View {
     }
 
     private func spacing(for width: CGFloat) -> CGFloat {
-        max(3, (width - CGFloat(barCount) * 4) / CGFloat(max(1, barCount - 1)))
+        max(3, (width - CGFloat(Self.barCount) * 4) / CGFloat(max(1, Self.barCount - 1)))
     }
 
     private func barHeight(_ i: Int) -> CGFloat {
         let minH: CGFloat = 6
         let maxH: CGFloat = 88
         guard isActive else { return minH }
-        let env = envelope[i % envelope.count]
+        let env = Self.envelope[i % Self.envelope.count]
         let lvl = CGFloat(max(0, min(1, level)))
         return minH + (maxH - minH) * lvl * env
     }
@@ -290,7 +307,7 @@ private struct WaveformView: View {
     /// Gentle edge falloff so the center of the waveform reads as the loudest.
     private func barOpacity(_ i: Int) -> Double {
         guard isActive else { return 0.35 }
-        let center = Double(barCount - 1) / 2
+        let center = Double(Self.barCount - 1) / 2
         let distance = abs(Double(i) - center) / (center + 1)
         return 0.5 + 0.5 * (1 - distance)
     }
@@ -349,7 +366,7 @@ private struct SavedBanner: View {
             Capsule().fill(.ultraThinMaterial)
         )
         .overlay(
-            Capsule().stroke(Color.white.opacity(0.09), lineWidth: 1)
+            Capsule().stroke(Color.glassStroke, lineWidth: 1)
         )
     }
 }

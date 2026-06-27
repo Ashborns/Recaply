@@ -1,5 +1,10 @@
 import Foundation
 import AVFoundation
+import os
+
+/// Structured logging for camera capture. File-private so both `CameraService` and its
+/// recording delegate can use it without leaking the symbol.
+private let logger = Logger(subsystem: "cn.edu.njxzc.Recaply", category: "Camera")
 
 /// Failures surfaced by optional camera capture.
 enum CameraError: Error {
@@ -9,17 +14,36 @@ enum CameraError: Error {
     case configurationFailed
 }
 
+/// Abstraction over optional front-camera capture so `RecordViewModel` can be tested
+/// with a stub (and so Phase 5 can substitute a fake when wiring the pipeline).
+protocol CameraProviding {
+    /// Requests camera access if undetermined; returns the resulting authorization state.
+    func requestAccess() async -> Bool
+    /// Configure the session and begin recording a take. Suspends (off the main thread)
+    /// while the session is configured on its serial queue, then returns once recording
+    /// has begun. Throws on missing access or configuration failure.
+    func start() async throws
+    /// Returns the intended output URL immediately and triggers non-blocking finalize.
+    /// The `.mp4` is NOT yet sealed when this returns.
+    func stop() -> URL?
+    /// Suspends until the `AVCaptureMovieFileOutput` delegate has sealed the `.mp4`
+    /// (or determines there is nothing to wait for). No-op if the camera was off.
+    func waitForFinalization() async
+}
+
 /// Optional front-camera recorder.
 ///
 /// Wraps an `AVCaptureSession` + `AVCaptureMovieFileOutput` to write an `.mp4` to the
 /// app's Documents directory as `cam-<uuid>.mp4`. Singleton; the capture state machine
 /// calls `start()` when the user has the camera toggle on and `stop()` on record stop.
 ///
-/// `start()` is synchronous and throws if access is missing or configuration fails.
-/// `stop()` returns the intended output URL immediately; the file is finalized
-/// asynchronously via the recording delegate, which then stops the session. Callers
-/// that read the file (the Phase 5 pipeline) should do so shortly after capture.
-final class CameraService {
+/// `start()` is `async throws`: the session configuration + `startRunning()` run on a
+/// dedicated serial queue (`sessionQueue`) so the main thread is never blocked. `stop()`
+/// returns the intended output URL immediately and triggers finalization asynchronously.
+/// The `.mp4` is only fully written once the recording delegate's
+/// `didFinishRecordingTo` callback fires; await `waitForFinalization()` to reach that
+/// point before reading the file.
+final class CameraService: CameraProviding {
     static let shared = CameraService()
 
     private let session = AVCaptureSession()
@@ -33,17 +57,23 @@ final class CameraService {
     private var fileURL: URL?
     /// Guards one-time `beginConfiguration`/`commitConfiguration` of inputs + outputs.
     private var configured = false
+    /// `true` between `stop()` issuing `stopRecording()` and the delegate sealing the
+    /// file. Drives `waitForFinalization()`.
+    private var finalizeExpecting = false
+    /// Resumed from the recording delegate (on `sessionQueue`) to release a caller
+    /// awaiting `waitForFinalization()`.
+    private var finalizeContinuation: CheckedContinuation<Void, Never>?
 
     private init() {
-        delegate.onFinish = { [weak self] _ in
-            self?.handleRecordingFinish()
+        delegate.onFinish = { [weak self] error in
+            self?.handleRecordingFinish(error)
         }
     }
 
-    // MARK: - Authorization
+    // MARK: - CameraProviding
 
-    /// Requests camera access if undetermined, or returns the current state. Mirrors the
-    /// FitnessApp permission flow. Safe to call on every toggle.
+    /// Requests camera access if undetermined, or returns the current state. Safe to
+    /// call on every toggle.
     func requestAccess() async -> Bool {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -55,45 +85,74 @@ final class CameraService {
         }
     }
 
-    // MARK: - Capture
-
-    func start() throws {
+    func start() async throws {
         guard AVCaptureDevice.authorizationStatus(for: .video) == .authorized else {
             throw CameraError.notAuthorized
         }
 
-        var started = false
-        // Configure + start on the dedicated session queue for a deterministic contract:
-        // when `start()` returns, recording has begun (or it threw).
-        sessionQueue.sync {
-            self.configureSessionIfNeeded()
-            guard !self.session.inputs.isEmpty, !self.movieOutput.isRecording else { return }
+        // Configure + start on the dedicated serial session queue, but via a
+        // continuation so the calling (main) thread suspends instead of blocking on
+        // `sessionQueue.sync`. When `start()` returns, recording has begun or it threw.
+        // The error flows back through the continuation's value rather than a captured
+        // `var` (which would trip concurrent-mutation warnings in a `@Sendable` closure).
+        let thrownError: CameraError? = await withCheckedContinuation { continuation in
+            sessionQueue.async {
+                self.configureSessionIfNeeded()
+                // No usable camera input → configuration failed.
+                guard !self.session.inputs.isEmpty else {
+                    continuation.resume(returning: CameraError.configurationFailed)
+                    return
+                }
+                // Already recording a take → idempotent no-op.
+                guard !self.movieOutput.isRecording else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                if !self.session.isRunning {
+                    self.session.startRunning()
+                }
 
-            if !self.session.isRunning {
-                self.session.startRunning()
+                let url = FileManager.default
+                    .urls(for: .documentDirectory, in: .userDomainMask)[0]
+                    .appendingPathComponent("cam-\(UUID().uuidString).mp4")
+                self.fileURL = url
+                self.finalizeExpecting = false
+                self.movieOutput.startRecording(to: url, recordingDelegate: self.delegate)
+                continuation.resume(returning: nil)
             }
-
-            let url = FileManager.default
-                .urls(for: .documentDirectory, in: .userDomainMask)[0]
-                .appendingPathComponent("cam-\(UUID().uuidString).mp4")
-            self.fileURL = url
-            self.movieOutput.startRecording(to: url, recordingDelegate: self.delegate)
-            started = true
         }
-
-        guard started else { throw CameraError.configurationFailed }
+        if let thrownError { throw thrownError }
     }
 
     func stop() -> URL? {
         let url = fileURL
-        fileURL = nil
-        // Finalization is async: the delegate stops the session once the .mp4 is sealed.
+        // Finalization is async: trigger `stopRecording()` (non-blocking) and let the
+        // delegate seal the `.mp4`. `fileURL` is cleared by the delegate so a caller
+        // can still resolve `waitForFinalization()` against this take.
         sessionQueue.async {
+            self.finalizeExpecting = (url != nil) && self.movieOutput.isRecording
             if self.movieOutput.isRecording {
                 self.movieOutput.stopRecording()
             }
         }
         return url
+    }
+
+    /// Phase 5's pipeline MUST `await camera.waitForFinalization()` before reading the
+    /// video file returned by `stop()`, otherwise the `.mp4` may not be sealed yet.
+    /// Safe to call when the camera was off (returns immediately).
+    func waitForFinalization() async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            sessionQueue.async {
+                // Serialized against the delegate handler on this same queue.
+                if !self.finalizeExpecting {
+                    // Nothing pending: already sealed, or the camera was never recording.
+                    continuation.resume()
+                    return
+                }
+                self.finalizeContinuation = continuation
+            }
+        }
     }
 
     // MARK: - Session configuration
@@ -134,11 +193,18 @@ final class CameraService {
         configured = hasInput
     }
 
-    /// Invoked from the recording delegate once the take is sealed (or failed).
-    private func handleRecordingFinish() {
+    /// Invoked from the recording delegate once the take is sealed (or failed). Resumes
+    /// any caller awaiting `waitForFinalization()`. Runs on `sessionQueue`.
+    private func handleRecordingFinish(_ error: Error?) {
         sessionQueue.async {
+            self.finalizeExpecting = false
+            self.fileURL = nil
             if self.session.isRunning {
                 self.session.stopRunning()
+            }
+            if let continuation = self.finalizeContinuation {
+                self.finalizeContinuation = nil
+                continuation.resume()
             }
         }
     }
@@ -160,7 +226,7 @@ private final class MovieRecorderDelegate: NSObject, AVCaptureFileOutputRecordin
     ) {
         // Phase 1 only logs finalization failures; the Phase 5 pipeline validates the file.
         if let error {
-            print("[CameraService] recording finished with error: \(error)")
+            logger.error("recording finished with error: \(error.localizedDescription, privacy: .public)")
         }
         onFinish?(error)
     }

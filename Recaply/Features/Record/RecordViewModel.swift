@@ -24,18 +24,20 @@ final class RecordViewModel: ObservableObject {
     @Published var startError: String?
 
     private let recorder: RecordingProviding
-    private let camera: CameraService
+    private let camera: CameraProviding
     private var levelTimer: Timer?
 
     init(recorder: RecordingProviding = RecordingService.shared,
-         camera: CameraService = .shared) {
+         camera: CameraProviding = CameraService.shared) {
         self.recorder = recorder
         self.camera = camera
     }
 
     // MARK: - Capture lifecycle
 
-    func start(tag: SessionTag, title: String?) throws {
+    func start(tag: SessionTag, title: String?) async throws {
+        // Guard against a double-start leaking a second timer / second capture.
+        guard phase == .idle else { return }
         self.tag = tag
         self.title = title ?? ""
         self.level = 0
@@ -43,12 +45,17 @@ final class RecordViewModel: ObservableObject {
         self.startError = nil
 
         _ = try recorder.start()
-        if cameraOn { try? camera.start() }
+        if cameraOn { try await camera.start() }
 
         phase = .recording
-        levelTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.level = self?.recorder.currentLevel ?? 0 }
+        // Schedule + add to `.common` so the waveform keeps animating during tracking
+        // touch (scroll/gesture) instead of stalling in the default run-loop mode.
+        let timer = Timer(timeInterval: 0.05, repeats: true) { [weak self] _ in
+            // Read directly on the main run loop — no per-tick `Task` hop.
+            self?.level = self?.recorder.currentLevel ?? 0
         }
+        RunLoop.main.add(timer, forMode: .common)
+        levelTimer = timer
     }
 
     func stop() {
@@ -62,6 +69,8 @@ final class RecordViewModel: ObservableObject {
         level = 0
 
         let (url, duration) = (try? recorder.stop()) ?? (URL(fileURLWithPath: "/dev/null"), 0)
+        // `stop()` returns the intended URL immediately; the `.mp4` is sealed async.
+        // Phase 5 must `await camera.waitForFinalization()` before reading videoURL.
         let videoURL = cameraOn ? camera.stop() : nil
         lastRecording = RecordingInfo(
             id: UUID(),

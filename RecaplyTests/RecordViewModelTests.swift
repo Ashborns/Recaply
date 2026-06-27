@@ -5,10 +5,10 @@ final class RecordViewModelTests: XCTestCase {
     // `@MainActor` because `RecordViewModel` is main-actor-isolated; the assertions
     // below are unchanged from the approved spec (idle → recording → stopping).
     @MainActor
-    func testIdleToRecordingToStopping() {
-        let vm = RecordViewModel(recorder: StubRecorder())
+    func testIdleToRecordingToStopping() async throws {
+        let vm = RecordViewModel(recorder: StubRecorder(), camera: StubCamera())
         XCTAssertEqual(vm.phase, .idle)
-        try? vm.start(tag: .meeting, title: nil)
+        try? await vm.start(tag: .meeting, title: nil)
         XCTAssertEqual(vm.phase, .recording)
         vm.stop()
         XCTAssertEqual(vm.phase, .stopping)
@@ -18,8 +18,15 @@ final class RecordViewModelTests: XCTestCase {
 
 private final class StubRecorder: RecordingProviding {
     var currentLevel: Float = 0.5
-    func start() throws -> URL { URL(string: "file:///tmp/rec.m4a")! }
+    func start() throws -> URL { URL(fileURLWithPath: "/tmp/rec.m4a") }
     func stop() throws -> (url: URL, duration: TimeInterval) {
-        (URL(string: "file:///tmp/rec.m4a")!, 42)
+        (URL(fileURLWithPath: "/tmp/rec.m4a"), 42)
     }
+}
+
+private final class StubCamera: CameraProviding {
+    func requestAccess() async -> Bool { true }
+    func start() async throws {}
+    func stop() -> URL? { nil }
+    func waitForFinalization() async {}
 }

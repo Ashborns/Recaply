@@ -12,6 +12,10 @@ extension Color {
     static let textSecondary = Color(red: 0.788, green: 0.773, blue: 0.863) // #C9C5DC
     static let textTertiary = Color(red: 0.541, green: 0.522, blue: 0.659)   // #8A85A8
 
+    // Glassmorphism surface tokens
+    static let glassFill = Color.white.opacity(0.05)
+    static let glassStroke = Color.white.opacity(0.09)
+
     // Accent gradient endpoints
     static let accentPurple = Color(red: 0.482, green: 0.424, blue: 1.0) // #7B6CFF
     static let accentCyan = Color(red: 0.133, green: 0.827, blue: 0.933) // #22D3EE
