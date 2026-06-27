@@ -56,7 +56,7 @@ final class PlaybackController: ObservableObject {
     private func startTimer() {
         stopTimer()
         let timer = Timer(timeInterval: 0.25, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 guard let self, let player = self.player else { return }
                 self.currentTime = player.currentTime
                 self.duration = player.duration

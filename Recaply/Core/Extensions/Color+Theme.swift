@@ -15,6 +15,8 @@ extension Color {
     // Glassmorphism surface tokens
     static let glassFill = Color.white.opacity(0.05)
     static let glassStroke = Color.white.opacity(0.09)
+    static let surfaceRaised = Color(red: 0.055, green: 0.057, blue: 0.085)
+    static let surfaceDeep = Color(red: 0.025, green: 0.027, blue: 0.043)
 
     // Accent gradient endpoints
     static let accentPurple = Color(red: 0.482, green: 0.424, blue: 1.0) // #7B6CFF

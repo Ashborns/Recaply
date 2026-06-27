@@ -37,8 +37,7 @@ final class LLMClient: LLMProviding {
     static let shared = LLMClient()
 
     let providerName = "glm"
-    private let endpointString = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
-    private let model = "glm-4-flash"
+    private let endpointString = "https://api.z.ai/api/coding/paas/v4/chat/completions"
     private let keychain: KeychainStore
     private let session: URLSession
 
@@ -48,10 +47,12 @@ final class LLMClient: LLMProviding {
     }
 
     func complete(messages: [LLMMessage], jsonMode: Bool) async throws -> String {
-        guard let apiKey = keychain.read("glm_key"), !apiKey.isEmpty else {
+        guard let apiKey = keychain.read("glm_key") ?? LocalEnvironment.value(for: "GLM_API_KEY"),
+              !apiKey.isEmpty else {
             throw LLMError.missingAPIKey(providerName)
         }
         guard let endpoint = URL(string: endpointString) else { throw LLMError.invalidEndpoint }
+        let model = LocalEnvironment.value(for: "GLM_MODEL") ?? "glm-4.7"
         return try await Self.post(endpoint: endpoint, model: model, messages: messages,
                                    jsonMode: jsonMode, apiKey: apiKey, session: session)
     }
@@ -85,6 +86,108 @@ final class LLMClient: LLMProviding {
         } catch {
             throw LLMError.transport(error.localizedDescription)
         }
+    }
+}
+
+final class GroqLLMClient: LLMProviding {
+    static let shared = GroqLLMClient()
+
+    let providerName = "groq"
+    private let endpointString = "https://api.groq.com/openai/v1/chat/completions"
+    private let keychain: KeychainStore
+    private let session: URLSession
+
+    init(keychain: KeychainStore = .shared, session: URLSession = .shared) {
+        self.keychain = keychain
+        self.session = session
+    }
+
+    func complete(messages: [LLMMessage], jsonMode: Bool) async throws -> String {
+        guard let apiKey = keychain.read("groq_key") ?? LocalEnvironment.value(for: "GROQ_API_KEY"),
+              !apiKey.isEmpty else {
+            throw LLMError.missingAPIKey(providerName)
+        }
+        guard let endpoint = URL(string: endpointString) else { throw LLMError.invalidEndpoint }
+        let model = LocalEnvironment.value(for: "GROQ_MODEL") ?? "llama-3.1-8b-instant"
+        return try await LLMClient.post(endpoint: endpoint, model: model, messages: messages,
+                                        jsonMode: jsonMode, apiKey: apiKey, session: session)
+    }
+}
+
+struct AIServiceResult<Payload> {
+    let payload: Payload
+    let warning: String?
+}
+
+enum AIServiceWarning {
+    static func recoveredWithFallback(primary: LLMProviding, fallback: LLMProviding, error: Error) -> String {
+        "AI server issue: \(primary.providerName) failed (\(friendly(error))). Recaply recovered with \(fallback.providerName) fallback, so the result may be slightly different."
+    }
+
+    private static func friendly(_ error: Error) -> String {
+        if let localized = (error as? LocalizedError)?.errorDescription, !localized.isEmpty {
+            return localized
+        }
+        return error.localizedDescription
+    }
+}
+
+enum AIProviderFailure: LocalizedError {
+    case allProvidersFailed(primary: LLMProviding, fallback: LLMProviding?, errors: [Error])
+
+    var errorDescription: String? {
+        switch self {
+        case .allProvidersFailed(let primary, let fallback, let errors):
+            let fallbackName = fallback?.providerName ?? "fallback AI"
+            let details = errors.map { error in
+                if let localized = (error as? LocalizedError)?.errorDescription, !localized.isEmpty {
+                    return localized
+                }
+                return error.localizedDescription
+            }.joined(separator: " • ")
+            return "AI agent failed: \(primary.providerName) and \(fallbackName) could not generate this recap\(details.isEmpty ? "" : " (\(details))"). Please check the connection/API keys and try re-recap."
+        }
+    }
+}
+
+enum LocalEnvironment {
+    static func value(for key: String) -> String? {
+        if let value = ProcessInfo.processInfo.environment[key], !value.isEmpty {
+            return value
+        }
+
+        for url in candidateURLs() {
+            guard let raw = try? String(contentsOf: url, encoding: .utf8),
+                  let value = parse(raw)[key],
+                  !value.isEmpty else { continue }
+            return value
+        }
+        return nil
+    }
+
+    private static func candidateURLs() -> [URL] {
+        var urls: [URL] = []
+        if let bundled = Bundle.main.url(forResource: ".env", withExtension: nil) {
+            urls.append(bundled)
+        }
+        urls.append(URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent(".env"))
+        return urls
+    }
+
+    private static func parse(_ raw: String) -> [String: String] {
+        var values: [String: String] = [:]
+        for line in raw.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty, !trimmed.hasPrefix("#"), let eq = trimmed.firstIndex(of: "=") else { continue }
+            let key = String(trimmed[..<eq]).trimmingCharacters(in: .whitespacesAndNewlines)
+            var value = String(trimmed[trimmed.index(after: eq)...]).trimmingCharacters(in: .whitespacesAndNewlines)
+            if value.hasPrefix("\""), value.hasSuffix("\""), value.count >= 2 {
+                value.removeFirst()
+                value.removeLast()
+            }
+            values[key] = value
+        }
+        return values
     }
 }
 
@@ -124,9 +227,42 @@ enum PromptBuilder {
     }
 
     static func summary(segments: [TranscriptSegmentModel], tag: SessionTag) -> [LLMMessage] {
-        let body = segments.map { "[\($0.label.rawValue)] \($0.text)" }.joined(separator: "\n")
-        let system = "Summarize this \(tag.rawValue). Return JSON ONLY: " +
-            "{\"overview\":\"...\",\"actionItems\":[\"...\"],\"decisions\":[\"...\"],\"keyPoints\":[\"...\"]}."
+        let body = segments.map {
+            "[\($0.index) @\(Int($0.timestamp))s] [\($0.label.rawValue)] \($0.text)"
+        }.joined(separator: "\n")
+        let system = """
+        You are Recaply's note-taking engine. Summarize this \(tag.rawValue) transcript.
+        Return JSON ONLY with this exact schema:
+        {"overview":"...","actionItems":["..."],"decisions":["..."],"keyPoints":["..."]}.
+        Rules:
+        - Preserve the transcript language. If the transcript is Indonesian, answer in Indonesian; if Japanese, answer in Japanese; if mixed, use the dominant language.
+        - Do not invent facts, names, dates, deadlines, tasks, or decisions that are not stated.
+        - overview must be 1-2 concise sentences explaining the actual topic and outcome, not a raw transcript excerpt.
+        - keyPoints must be 3-6 distinct, useful bullets about the material. Do not duplicate actionItems or decisions.
+        - actionItems must contain only explicit follow-up tasks. Use [] if none are stated.
+        - decisions must contain only explicit decisions/conclusions. Use [] if none are stated.
+        - Ignore filler, repeated live-caption fragments, false starts, and recognition noise.
+        """
         return [LLMMessage(role: "system", content: system), LLMMessage(role: "user", content: body)]
+    }
+
+    static func recordingQuestion(context: String, question: String) -> [LLMMessage] {
+        let system = """
+        You are Recaply's recording Q&A assistant. Answer questions using ONLY the provided recording context.
+        Rules:
+        - Preserve the user's language when possible.
+        - If the answer is not in the recording context, say that it was not mentioned in the recording.
+        - Do not invent facts, names, tasks, dates, deadlines, or decisions.
+        - Be concise, but include useful supporting details from the transcript.
+        - If relevant, mention timestamps from transcript lines like [03:12].
+        """
+        let user = """
+        Recording context:
+        \(context)
+
+        Question:
+        \(question)
+        """
+        return [LLMMessage(role: "system", content: system), LLMMessage(role: "user", content: user)]
     }
 }

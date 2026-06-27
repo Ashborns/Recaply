@@ -4,18 +4,36 @@ final class TranscriptEnhancementService {
     static let shared = TranscriptEnhancementService()
 
     private let primary: LLMProviding
-    private let fallback: LLMProviding
+    private let fallback: LLMProviding?
 
-    init(primary: LLMProviding = LLMClient.shared, fallback: LLMProviding = DeepseekClient.shared) {
+    init(primary: LLMProviding = LLMClient.shared, fallback: LLMProviding? = GroqLLMClient.shared) {
         self.primary = primary
         self.fallback = fallback
     }
 
-    func enhance(segments: [TranscriptSegmentModel], tag: SessionTag) async -> EnhancedTranscriptPayload {
+    func enhance(segments: [TranscriptSegmentModel], tag: SessionTag) async throws -> EnhancedTranscriptPayload {
+        try await enhanceWithDiagnostics(segments: segments, tag: tag).payload
+    }
+
+    func enhanceWithDiagnostics(segments: [TranscriptSegmentModel], tag: SessionTag) async throws -> AIServiceResult<EnhancedTranscriptPayload> {
         let messages = PromptBuilder.enhancement(segments: segments, tag: tag)
-        if let payload = try? await requestPayload(from: primary, messages: messages) { return payload }
-        if let payload = try? await requestPayload(from: fallback, messages: messages) { return payload }
-        return fallbackPayload(for: segments)
+        do {
+            return AIServiceResult(payload: try await requestPayload(from: primary, messages: messages), warning: nil)
+        } catch {
+            var errors = [error]
+            if let fallback {
+                do {
+                    let payload = try await requestPayload(from: fallback, messages: messages)
+                    return AIServiceResult(
+                        payload: payload,
+                        warning: AIServiceWarning.recoveredWithFallback(primary: primary, fallback: fallback, error: error)
+                    )
+                } catch {
+                    errors.append(error)
+                }
+            }
+            throw AIProviderFailure.allProvidersFailed(primary: primary, fallback: fallback, errors: errors)
+        }
     }
 
     private func requestPayload(from provider: LLMProviding, messages: [LLMMessage]) async throws -> EnhancedTranscriptPayload {
@@ -23,12 +41,6 @@ final class TranscriptEnhancementService {
         return try JSONDecoder().decode(EnhancedTranscriptPayload.self, from: Data(extractJSON(from: raw).utf8))
     }
 
-    private func fallbackPayload(for segments: [TranscriptSegmentModel]) -> EnhancedTranscriptPayload {
-        EnhancedTranscriptPayload(
-            clean: segments.map { .init(index: $0.index, text: $0.text) },
-            polished: [.init(heading: "Transcript", body: segments.map(\.text).joined(separator: " "))]
-        )
-    }
 }
 
 func extractJSON(from raw: String) -> String {

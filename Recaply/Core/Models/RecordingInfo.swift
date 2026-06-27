@@ -9,4 +9,5 @@ struct RecordingInfo: Identifiable, Equatable {
     var audioURL: URL?
     var videoURL: URL?
     var status: PipelineStatus
+    var liveTranscript: String? = nil
 }

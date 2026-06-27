@@ -39,6 +39,30 @@ final class RecordingRepository {
         }
     }
 
+    func updateTitle(_ title: String?, for id: UUID) {
+        context.performAndWait {
+            guard let object = recordingObject(id: id) else { return }
+            let trimmed = title?.trimmingCharacters(in: .whitespacesAndNewlines)
+            object.setValue(trimmed?.isEmpty == true ? nil : trimmed, forKey: "title")
+            saveContext()
+        }
+    }
+
+    func deleteRecording(id: UUID, removeMediaFiles: Bool = true) {
+        context.performAndWait {
+            guard let object = recordingObject(id: id) else { return }
+            let recording = readRecording(object)
+            context.delete(object)
+            saveContext()
+
+            guard removeMediaFiles else { return }
+            [recording?.audioURL, recording?.videoURL].compactMap { $0 }.forEach { url in
+                guard url.isFileURL else { return }
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
+    }
+
     func appendSegments(_ segments: [TranscriptSegmentModel], to recording: RecordingInfo) {
         context.performAndWait {
             guard let recordingObject = recordingObject(id: recording.id) else { return }

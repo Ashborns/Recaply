@@ -57,6 +57,8 @@ for dirpath, dirnames, filenames in os.walk(SRC):
             pass  # referenced via INFOPLIST_FILE, never a build resource
         elif f.endswith(".mlmodel"):
             resource_files.append((rel, abspath, "mlmodel"))
+        elif f == ".env":
+            resource_files.append((rel, abspath, "env"))
         elif f.endswith(".json"):
             resource_files.append((rel, abspath, "json"))
         elif f.endswith(".plist"):
@@ -136,7 +138,8 @@ def emit_build_files(L):
     for rel, _, _ in res_all:
         ref, bld = res_ids[rel]
         name = os.path.basename(rel)
-        L.append(f"\t\t{bld} /* {name} in Resources */ = {{isa = PBXBuildFile; fileRef = {ref} /* {name} */; }};")
+        phase_name = "Sources" if rel.endswith(".xcdatamodeld") else "Resources"
+        L.append(f"\t\t{bld} /* {name} in {phase_name} */ = {{isa = PBXBuildFile; fileRef = {ref} /* {name} */; }};")
     for rel, _ in test_swift_files:
         ref, bld = test_ids[rel]
         name = os.path.basename(rel)
@@ -279,6 +282,11 @@ def emit_phases(L):
         for rel, _ in files:
             _, bld = ids[rel]
             L.append(f"\t\t\t\t{bld} /* {os.path.basename(rel)} in Sources */,")
+        if ph == SOURCES_PHASE:
+            for rel, _, kind in res_all:
+                if kind == "datamodel":
+                    _, bld = res_ids[rel]
+                    L.append(f"\t\t\t\t{bld} /* {os.path.basename(rel)} in Sources */,")
         L.append("\t\t\t);")
         L.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
         L.append("\t\t};")
@@ -290,7 +298,9 @@ def emit_phases(L):
     L.append("\t\t\tisa = PBXResourcesBuildPhase;")
     L.append("\t\t\tbuildActionMask = 2147483647;")
     L.append("\t\t\tfiles = (")
-    for rel, _, _ in res_all:
+    for rel, _, kind in res_all:
+        if kind == "datamodel":
+            continue
         _, bld = res_ids[rel]
         L.append(f"\t\t\t\t{bld} /* {os.path.basename(rel)} in Resources */,")
     L.append("\t\t\t);")
@@ -344,7 +354,7 @@ def emit_targets_and_deps(L):
     L.append(f"\t\t\tname = {TEST_TARGET};")
     L.append(f"\t\t\tproductName = {TEST_TARGET};")
     L.append(f"\t\t\tproductReference = {TEST_PRODUCT_REF} /* {TEST_TARGET}.xctest */;")
-    L.append("\t\t\tproductType = \"com.apple.product-type.bundle\";")
+    L.append("\t\t\tproductType = \"com.apple.product-type.bundle.unit-test\";")
     L.append("\t\t};")
     L.append("/* End PBXNativeTarget section */")
 
@@ -405,7 +415,13 @@ TEST_BUILD = f"""\t\t\t\tBUNDLE_LOADER = "$(TEST_HOST)";
 \t\t\t\tCODE_SIGN_STYLE = Automatic;
 \t\t\t\tCURRENT_PROJECT_VERSION = 1;
 \t\t\t\tDEVELOPMENT_TEAM = "";
+\t\t\t\tENABLE_TESTING_SEARCH_PATHS = YES;
 \t\t\t\tGENERATE_INFOPLIST_FILE = YES;
+\t\t\t\tLD_RUNPATH_SEARCH_PATHS = (
+\t\t\t\t\t"$(inherited)",
+\t\t\t\t\t"@executable_path/Frameworks",
+\t\t\t\t\t"@loader_path/Frameworks",
+\t\t\t\t);
 \t\t\t\tMARKETING_VERSION = 1.0;
 \t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = {TEST_BUNDLE_ID};
 \t\t\t\tPRODUCT_NAME = "$(TARGET_NAME)";

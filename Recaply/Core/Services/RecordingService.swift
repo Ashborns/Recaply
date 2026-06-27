@@ -32,6 +32,7 @@ final class RecordingService: RecordingProviding {
     /// Written from the audio render thread, polled by the UI timer. A torn `Float`
     /// read is visually harmless for a waveform, so no lock is used by design.
     private(set) var currentLevel: Float = 0
+    private var audioBufferConsumer: ((AVAudioPCMBuffer) -> Void)?
 
     private init() {}
 
@@ -66,6 +67,7 @@ final class RecordingService: RecordingProviding {
         engine.inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
             guard let self else { return }
             self.currentLevel = self.level(from: buffer)
+            self.audioBufferConsumer?(buffer)
             do {
                 try self.file?.write(from: buffer)
             } catch {
@@ -92,7 +94,12 @@ final class RecordingService: RecordingProviding {
         file = nil
         fileURL = nil
         currentLevel = 0
+        audioBufferConsumer = nil
         return (url, duration)
+    }
+
+    func setAudioBufferConsumer(_ consumer: ((AVAudioPCMBuffer) -> Void)?) {
+        audioBufferConsumer = consumer
     }
 
     // MARK: - Self-recovery

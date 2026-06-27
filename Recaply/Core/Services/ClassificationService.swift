@@ -1,7 +1,7 @@
 import Foundation
 
 final class ClassificationService {
-    static let shared = ClassificationService(provider: StubClassifierProvider())
+    static let shared = ClassificationService(provider: CoreMLClassifierProvider.shared)
 
     private let provider: ClassificationProviding
 

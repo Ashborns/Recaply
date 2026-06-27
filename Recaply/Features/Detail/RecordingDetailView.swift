@@ -3,30 +3,153 @@ import SwiftUI
 struct RecordingDetailView: View {
     @StateObject private var vm: RecordingDetailViewModel
     @StateObject private var playback = PlaybackController()
+    @StateObject private var retryPipeline = PipelineCoordinator()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dismiss) private var dismiss
+    @State private var renameTitle = ""
+    @State private var showRename = false
+    @State private var showDelete = false
+    @State private var showAskAI = false
+    @State private var retryRecording: RecordingInfo?
+    @Namespace private var transcriptModeNamespace
 
     init(recordingID: UUID) {
         _vm = StateObject(wrappedValue: RecordingDetailViewModel(recordingID: recordingID))
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack {
             Color.appBackground.ignoresSafeArea()
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
+                    topBar
                     header
+                    insightStrip
+                    audioPlaybackCard
+                    if vm.recording?.status == .failed {
+                        failedRecapCard
+                    }
                     summaryCard
                     transcriptPicker
                     transcriptBody
-                        .padding(.bottom, 92)
                 }
                 .padding(20)
+                .padding(.bottom, 40)
             }
-            playbackBar
         }
-        .navigationTitle("Detail")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { playback.load(url: vm.recording?.audioURL) }
+        .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            playback.load(url: vm.recording?.audioURL)
+            renameTitle = vm.recording?.title ?? ""
+        }
+        .sheet(isPresented: $showAskAI) {
+            askAISheet
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(Color.appBackground)
+        }
+        .fullScreenCover(item: $retryRecording) { recording in
+            ProcessingStageView(coordinator: retryPipeline, recording: recording) { _ in
+                retryRecording = nil
+                vm.reload()
+            } onCancel: {
+                retryRecording = nil
+                vm.reload()
+            }
+            .task {
+                await retryPipeline.run(recording)
+            }
+        }
+        .alert("Rename session", isPresented: $showRename) {
+            TextField("Session title", text: $renameTitle)
+            Button("Save") { vm.rename(to: renameTitle) }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Give this recording a title that is easy to find in Library.")
+        }
+        .confirmationDialog("Delete recording?", isPresented: $showDelete) {
+            Button("Delete Recording", role: .destructive) {
+                vm.deleteRecording()
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This removes the transcript, summary, and saved media files.")
+        }
+    }
+
+    private var topBar: some View {
+        HStack(spacing: 10) {
+            Button { dismiss() } label: {
+                Image(systemName: "chevron.left")
+                    .font(.headline)
+                    .foregroundColor(.textPrimary)
+                    .frame(width: 38, height: 38)
+                    .background(Color.surfaceRaised.opacity(0.92), in: Circle())
+            }
+
+            Spacer()
+
+            Button {
+                showAskAI = true
+            } label: {
+                Label("Ask AI", systemImage: "sparkles")
+                    .font(.caption.bold())
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.textPrimary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color.accentPurple.opacity(0.18), in: Capsule())
+
+            Button {
+                renameTitle = vm.recording?.title ?? ""
+                showRename = true
+            } label: {
+                Label("Rename", systemImage: "pencil")
+                    .font(.caption.bold())
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.textPrimary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color.surfaceRaised.opacity(0.92), in: Capsule())
+
+            exportMenu
+
+            Button {
+                showDelete = true
+            } label: {
+                Image(systemName: "trash")
+                    .font(.headline)
+                    .foregroundColor(.catAction)
+                    .frame(width: 38, height: 38)
+                    .background(Color.catAction.opacity(0.10), in: Circle())
+            }
+        }
+    }
+
+    private var exportMenu: some View {
+        Menu {
+            if let textURL = vm.exportTextURL {
+                ShareLink(item: textURL) {
+                    Label("Export Text", systemImage: "doc.text")
+                }
+            }
+            if let jsonURL = vm.exportJSONURL {
+                ShareLink(item: jsonURL) {
+                    Label("Export JSON", systemImage: "curlybraces")
+                }
+            }
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+                .font(.headline)
+                .foregroundColor(.textPrimary)
+                .frame(width: 38, height: 38)
+                .background(Color.surfaceRaised.opacity(0.92), in: Circle())
+        }
     }
 
     private var header: some View {
@@ -47,8 +170,27 @@ struct RecordingDetailView: View {
     private var summaryCard: some View {
         glassCard {
             VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 10) {
+                    Image(systemName: vm.summary == nil ? "exclamationmark.triangle.fill" : "sparkles")
+                        .foregroundColor(vm.summary == nil ? .catAction : .accentCyan)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(vm.summary == nil ? "Summary unavailable" : "AI Summary")
+                            .font(.title3.bold())
+                            .foregroundColor(.textPrimary)
+                        Text(vm.summary == nil ? "Retry recap to generate a summary with GLM or Groq." : "Generated from the transcript using the AI agent.")
+                            .font(.caption)
+                            .foregroundColor(.textTertiary)
+                    }
+                    Spacer()
+                    Text(vm.summary == nil ? "Failed" : "AI")
+                        .font(.caption.bold())
+                        .foregroundColor(vm.summary == nil ? .catAction : .accentCyan)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.white.opacity(0.06), in: Capsule())
+                }
                 section("Overview", color: .accentCyan) {
-                    Text(vm.summary?.overview ?? "Summary will appear after processing. Transcript remains available below.")
+                    Text(vm.overviewText)
                         .foregroundColor(.textSecondary)
                 }
                 section("Action items", color: .catAction) {
@@ -70,22 +212,323 @@ struct RecordingDetailView: View {
                     }
                 }
                 section("Decisions", color: .catDecision) {
-                    bulletList(vm.summary?.decisions ?? [])
+                    bulletList(vm.decisions)
                 }
                 section("Key points", color: .catQuestion) {
-                    bulletList(vm.summary?.keyPoints ?? [])
+                    bulletList(vm.keyPoints)
                 }
             }
         }
     }
 
-    private var transcriptPicker: some View {
-        Picker("Transcript", selection: $vm.mode) {
-            ForEach(RecordingDetailViewModel.TranscriptMode.allCases) { mode in
-                Text(mode.rawValue).tag(mode)
+    private var failedRecapCard: some View {
+        glassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.catAction)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("AI recap failed")
+                            .font(.headline)
+                            .foregroundColor(.textPrimary)
+                        Text("The recording is saved, but the AI agents could not generate a recap.")
+                            .font(.caption)
+                            .foregroundColor(.textTertiary)
+                    }
+                }
+
+                Text("Try again when your connection/API keys are available. Recaply will use GLM first, then Groq. No local fallback recap will be generated.")
+                    .font(.footnote)
+                    .foregroundColor(.textSecondary)
+
+                Button {
+                    guard let recording = vm.recording else { return }
+                    retryRecording = recording
+                } label: {
+                    Label("Retry Recap", systemImage: "arrow.clockwise")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.accentGradient, in: Capsule())
+                }
+                .buttonStyle(.plain)
             }
         }
-        .pickerStyle(.segmented)
+    }
+
+    private var insightStrip: some View {
+        HStack(spacing: 10) {
+            insight("Actions", vm.labelCounts[.actionItem, default: 0], .catAction)
+            insight("Decisions", vm.labelCounts[.decision, default: 0], .catDecision)
+            insight("Questions", vm.labelCounts[.question, default: 0], .catQuestion)
+            insight("Confidence", Int(vm.averageConfidence * 100), .accentCyan, suffix: "%")
+        }
+    }
+
+    private func insight(_ title: String, _ value: Int, _ color: Color, suffix: String = "") -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("\(value)\(suffix)")
+                .font(.headline.monospacedDigit())
+                .foregroundColor(.textPrimary)
+            Text(title)
+                .font(.caption2.bold())
+                .foregroundColor(.textTertiary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(color.opacity(0.13), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private var transcriptPicker: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Transcript Views")
+                    .font(.headline)
+                    .foregroundColor(.textPrimary)
+                Spacer()
+                Text(transcriptModeCaption)
+                    .font(.caption)
+                    .foregroundColor(.textTertiary)
+            }
+            HStack(spacing: 6) {
+                ForEach(RecordingDetailViewModel.TranscriptMode.allCases) { mode in
+                    transcriptModeButton(mode)
+                }
+            }
+            .padding(4)
+            .background(Color.surfaceRaised.opacity(0.88), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.glassStroke, lineWidth: 1))
+        }
+    }
+
+    private var askAISheet: some View {
+        NavigationStack {
+            ZStack {
+                Color.appBackground.ignoresSafeArea()
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 18) {
+                        askAIHeader
+                        askAIComposer
+                        askAIStatus
+                        askAIAnswer
+                    }
+                    .padding(20)
+                    .padding(.bottom, 30)
+                }
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.appBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { showAskAI = false }
+                        .foregroundColor(.accentCyan)
+                }
+            }
+        }
+    }
+
+    private var askAIHeader: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                Image(systemName: "sparkles")
+                    .font(.title3.bold())
+                    .foregroundColor(.white)
+                    .frame(width: 42, height: 42)
+                    .background(Color.accentGradient, in: Circle())
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Ask AI")
+                        .font(.largeTitle.bold())
+                        .foregroundColor(.textPrimary)
+                    Text(vm.recording?.title ?? "This recording")
+                        .font(.subheadline)
+                        .foregroundColor(.textSecondary)
+                        .lineLimit(1)
+                }
+            }
+            Text("Ask questions about the transcript, recap, decisions, or action items. Answers are limited to this recording's content.")
+                .font(.footnote)
+                .foregroundColor(.textTertiary)
+        }
+    }
+
+    private var askAIComposer: some View {
+        glassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Question")
+                    .font(.headline)
+                    .foregroundColor(.textPrimary)
+
+                TextEditor(text: $vm.askQuestionText)
+                    .font(.body)
+                    .foregroundColor(.textPrimary)
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 96, maxHeight: 150)
+                    .padding(10)
+                    .background(Color.surfaceDeep.opacity(0.72), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.glassStroke, lineWidth: 1))
+                    .overlay(alignment: .topLeading) {
+                        if vm.askQuestionText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            Text("Example: What were the main decisions in this meeting?")
+                                .font(.body)
+                                .foregroundColor(.textTertiary)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 18)
+                                .allowsHitTesting(false)
+                        }
+                    }
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        suggestedQuestionButton("What are the key points?")
+                        suggestedQuestionButton("What action items were mentioned?")
+                        suggestedQuestionButton("What decisions were made?")
+                        suggestedQuestionButton("Explain this recording briefly.")
+                    }
+                }
+
+                Button {
+                    Task { await vm.askAI() }
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                } label: {
+                    HStack(spacing: 8) {
+                        if vm.isAskingAI {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Image(systemName: "paperplane.fill")
+                        }
+                        Text(vm.isAskingAI ? "Thinking…" : "Ask")
+                            .font(.subheadline.bold())
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(canAskAI ? AnyShapeStyle(Color.accentGradient) : AnyShapeStyle(Color.white.opacity(0.08)), in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .disabled(!canAskAI)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var askAIStatus: some View {
+        if let warning = vm.askWarningText {
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.catQuestion)
+                Text(warning)
+                    .font(.caption)
+                    .foregroundColor(.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.catQuestion.opacity(0.10), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+
+        if let error = vm.askErrorText {
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "xmark.octagon.fill")
+                    .foregroundColor(.catAction)
+                Text(error)
+                    .font(.caption)
+                    .foregroundColor(.textSecondary)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.catAction.opacity(0.10), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+    }
+
+    @ViewBuilder
+    private var askAIAnswer: some View {
+        if let answer = vm.askAnswerText {
+            glassCard {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "text.bubble.fill")
+                            .foregroundColor(.accentCyan)
+                        Text("Answer")
+                            .font(.headline)
+                            .foregroundColor(.textPrimary)
+                    }
+                    Text(answer)
+                        .foregroundColor(.textSecondary)
+                        .textSelection(.enabled)
+                }
+            }
+        } else if !vm.isAskingAI {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Suggestions")
+                    .font(.headline)
+                    .foregroundColor(.textPrimary)
+                Text("Use Ask AI to clarify concepts, find decisions, list follow-ups, or turn the recording into a short explanation.")
+                    .font(.footnote)
+                    .foregroundColor(.textTertiary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.surfaceRaised.opacity(0.72), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        }
+    }
+
+    private var canAskAI: Bool {
+        !vm.isAskingAI && !vm.askQuestionText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func suggestedQuestionButton(_ question: String) -> some View {
+        Button {
+            vm.useSuggestedQuestion(question)
+        } label: {
+            Text(question)
+                .font(.caption.bold())
+                .foregroundColor(.textSecondary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(Color.white.opacity(0.06), in: Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var transcriptModeCaption: String {
+        switch vm.mode {
+        case .clean: return "Readable transcript"
+        case .polished: return "Presentation notes"
+        case .raw: return "Original labels"
+        }
+    }
+
+    private func transcriptModeButton(_ mode: RecordingDetailViewModel.TranscriptMode) -> some View {
+        let isSelected = vm.mode == mode
+        return Button {
+            vm.mode = mode
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: mode.iconName)
+                    .font(.caption.weight(.bold))
+                Text(mode.rawValue)
+                    .font(.caption.weight(isSelected ? .bold : .semibold))
+            }
+            .foregroundColor(isSelected ? .textPrimary : .textTertiary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 11)
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.accentGradient)
+                        .matchedGeometryEffect(id: "transcriptMode", in: transcriptModeNamespace)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     @ViewBuilder
@@ -120,27 +563,53 @@ struct RecordingDetailView: View {
         }
     }
 
-    private var playbackBar: some View {
-        HStack(spacing: 12) {
-            Button { playback.toggle() } label: {
-                Image(systemName: playback.isPlaying ? "pause.fill" : "play.fill")
-                    .foregroundColor(.textPrimary)
-                    .frame(width: 34, height: 34)
-                    .background(Color.accentGradient, in: Circle())
+    private var audioPlaybackCard: some View {
+        glassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    Image(systemName: "waveform.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.accentCyan)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Recording audio")
+                            .font(.headline)
+                            .foregroundColor(.textPrimary)
+                        Text("Play the original recording or jump from transcript timestamps.")
+                            .font(.caption)
+                            .foregroundColor(.textTertiary)
+                    }
+                    Spacer()
+                    Text(playback.duration.asClock)
+                        .font(.caption.monospacedDigit().bold())
+                        .foregroundColor(.textSecondary)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 6)
+                        .background(Color.white.opacity(0.06), in: Capsule())
+                }
+
+                HStack(spacing: 12) {
+                    Button { playback.toggle() } label: {
+                        Image(systemName: playback.isPlaying ? "pause.fill" : "play.fill")
+                            .foregroundColor(.white)
+                            .frame(width: 40, height: 40)
+                            .background(Color.accentGradient, in: Circle())
+                    }
+                    .buttonStyle(.plain)
+
+                    VStack(spacing: 6) {
+                        Slider(value: Binding(get: { playback.currentTime }, set: { playback.seek(to: $0) }), in: 0...max(playback.duration, 1))
+                            .tint(.accentPurple)
+                        HStack {
+                            Text(playback.currentTime.asClock)
+                            Spacer()
+                            Text(max(0, playback.duration - playback.currentTime).asClock + " left")
+                        }
+                        .font(.caption.monospacedDigit())
+                        .foregroundColor(.textTertiary)
+                    }
+                }
             }
-            Text(playback.currentTime.asClock)
-                .font(.caption.monospacedDigit())
-                .foregroundColor(.textSecondary)
-            Slider(value: Binding(get: { playback.currentTime }, set: { playback.seek(to: $0) }), in: 0...max(playback.duration, 1))
-                .tint(.accentPurple)
-            Text(playback.duration.asClock)
-                .font(.caption.monospacedDigit())
-                .foregroundColor(.textTertiary)
         }
-        .padding(14)
-        .background(.ultraThinMaterial, in: Capsule())
-        .padding(.horizontal, 18)
-        .padding(.bottom, 12)
     }
 
     private func section<Content: View>(_ title: String, color: Color, @ViewBuilder content: () -> Content) -> some View {
@@ -201,7 +670,7 @@ struct RecordingDetailView: View {
         content()
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .background(Color.surfaceRaised.opacity(0.88), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.glassStroke, lineWidth: 1))
     }
 }

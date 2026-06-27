@@ -16,21 +16,28 @@ final class RecordViewModel: ObservableObject {
     @Published var phase: Phase = .idle
     /// Mic loudness `0...1` for the live waveform, polled while recording.
     @Published var level: Float = 0
+    @Published var elapsed: TimeInterval = 0
     @Published var tag: SessionTag = .meeting
     @Published var title: String = ""
     @Published var cameraOn: Bool = false
     @Published var lastRecording: RecordingInfo?
+    @Published var liveTranscript: String = ""
+    @Published var liveCaptionStatus: String = "Live captions appear while you speak."
     /// Friendly message surfaced inline when capture fails to start.
     @Published var startError: String?
 
     private let recorder: RecordingProviding
     private let camera: CameraProviding
+    private let liveTranscriber: LiveTranscriptionService
     private var levelTimer: Timer?
+    private var recordingStartedAt: Date?
 
     init(recorder: RecordingProviding = RecordingService.shared,
-         camera: CameraProviding = CameraService.shared) {
+         camera: CameraProviding = CameraService.shared,
+         liveTranscriber: LiveTranscriptionService = .shared) {
         self.recorder = recorder
         self.camera = camera
+        self.liveTranscriber = liveTranscriber
     }
 
     // MARK: - Capture lifecycle
@@ -41,18 +48,52 @@ final class RecordViewModel: ObservableObject {
         self.tag = tag
         self.title = title ?? ""
         self.level = 0
+        self.elapsed = 0
         self.lastRecording = nil
+        self.liveTranscript = ""
+        self.liveCaptionStatus = "Listening for speech…"
         self.startError = nil
+        self.recordingStartedAt = Date()
 
-        _ = try recorder.start()
-        if cameraOn { try await camera.start() }
+        if let recordingService = recorder as? RecordingService {
+            let liveReady = await liveTranscriber.start(locale: RecaplySpeechLanguage.selected.primaryLocale)
+            if liveReady {
+                liveTranscriber.onTranscript = { [weak self] text in
+                    Task { @MainActor [weak self] in
+                        self?.liveTranscript = text
+                        self?.liveCaptionStatus = "Live transcript"
+                    }
+                }
+                recordingService.setAudioBufferConsumer { [weak liveTranscriber] buffer in
+                    liveTranscriber?.append(buffer)
+                }
+            } else {
+                liveCaptionStatus = "Live captions unavailable; final transcript still runs after stop."
+                recordingService.setAudioBufferConsumer(nil)
+            }
+        } else {
+            liveCaptionStatus = "Live captions disabled for this recorder."
+        }
+
+        do {
+            _ = try recorder.start()
+            if cameraOn { try await camera.start() }
+        } catch {
+            (recorder as? RecordingService)?.setAudioBufferConsumer(nil)
+            liveTranscriber.stop()
+            throw error
+        }
 
         phase = .recording
         // Schedule + add to `.common` so the waveform keeps animating during tracking
         // touch (scroll/gesture) instead of stalling in the default run-loop mode.
         let timer = Timer(timeInterval: 0.05, repeats: true) { [weak self] _ in
-            // Read directly on the main run loop — no per-tick `Task` hop.
-            self?.level = self?.recorder.currentLevel ?? 0
+            // Keep UI state updates on the main actor for Swift concurrency checks.
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.level = self.recorder.currentLevel
+                self.elapsed = Date().timeIntervalSince(self.recordingStartedAt ?? Date())
+            }
         }
         RunLoop.main.add(timer, forMode: .common)
         levelTimer = timer
@@ -69,6 +110,11 @@ final class RecordViewModel: ObservableObject {
         level = 0
 
         let (url, duration) = (try? recorder.stop()) ?? (URL(fileURLWithPath: "/dev/null"), 0)
+        (recorder as? RecordingService)?.setAudioBufferConsumer(nil)
+        liveTranscriber.stop()
+        elapsed = duration
+        liveCaptionStatus = liveTranscript.isEmpty ? "Final transcript will be generated from audio." : "Live transcript captured."
+        recordingStartedAt = nil
         // `stop()` returns the intended URL immediately; the `.mp4` is sealed async.
         // Phase 5 must `await camera.waitForFinalization()` before reading videoURL.
         let videoURL = cameraOn ? camera.stop() : nil
@@ -80,7 +126,8 @@ final class RecordViewModel: ObservableObject {
             duration: duration,
             audioURL: url,
             videoURL: videoURL,
-            status: .captured
+            status: .captured,
+            liveTranscript: liveTranscript.isEmpty ? nil : liveTranscript
         )
 
         // MARK: - Phase 5 hook
