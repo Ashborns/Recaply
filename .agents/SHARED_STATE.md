@@ -28,9 +28,10 @@ skill spesifik. Marker: ⬜ TODO · 🔄 IN PROGRESS · ✅ STABLE · ❌ BLOCKE
 - `SummaryPayload { overview, actionItems, decisions, keyPoints }`
 - `EnhancedTranscriptPayload { clean: [CleanSegment{index,text}], polished: [TopicSection{heading,body}] }`
 - Service = singleton, constructor-injected (`.shared` default, overridable di test).
-  Protokol service (akan didefinisikan per agent): `RecordingServiceProtocol`,
-  `TranscriptionServiceProtocol`, `ClassificationServiceProtocol`,
-  `SummarizationServiceProtocol`, `TranscriptEnhancementServiceProtocol`.
+  Protokol service (akan didefinisikan per agent): `RecordingProviding`,
+  `TranscriptionProviding`, `ClassificationProviding`, `LLMProviding`.
+  (`SummarizationService` dan `TranscriptEnhancementService` = concrete singleton,
+  bukan protokol.)
 
 ## Status Build
 
@@ -68,3 +69,9 @@ skill spesifik. Marker: ⬜ TODO · 🔄 IN PROGRESS · ✅ STABLE · ❌ BLOCKE
   perlu tambah entity/atribut.
 - Klasifikasi CoreML: sebelum model trained, `ClassificationService` pakai stub yang
   return `discussion`/0 (design spec seksi 5 & 10).
+- Core Data optional policy: atribut boleh `optional="YES"` di model, tapi domain value
+  types memperlakukannya sebagai non-nil; repository default ke `""`/`[]` saat baca
+  (sehingga `actionItemsJSON` nil decode ke `[]`).
+- Lab-build gate: komponen Tahap 0 pindah 🔄 IN PROGRESS → ✅ STABLE hanya setelah
+  build lab pertama sukses; Agent 1–5 boleh menulis di atas scaffold sekarang, tapi
+  verifikasi compile ditunda ke lab (Tahap 6).

@@ -8,6 +8,8 @@ struct MainTabView: View {
             PlaceholderView("Settings").tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
         .tint(.accentPurple)
+        .toolbarBackground(.ultraThinMaterial, for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
     }
 }
 

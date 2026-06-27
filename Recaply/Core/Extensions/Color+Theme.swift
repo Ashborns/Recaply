@@ -28,6 +28,8 @@ extension Color {
     }
 }
 
-/// Spring used across the app (response ≈ 0.45, damping ≈ 0.8). Call sites should
-/// honor `@Environment(\.accessibilityReduceMotion)` and collapse to opacity-only.
-let recaplySpring: Animation = .spring(response: 0.45, dampingFraction: 0.8)
+extension Animation {
+    /// Signature app spring (response 0.45, damping 0.8). Use as `.recaplySpring`.
+    /// Honors Reduce Motion at the call site.
+    static let recaplySpring = Animation.spring(response: 0.45, dampingFraction: 0.8)
+}
