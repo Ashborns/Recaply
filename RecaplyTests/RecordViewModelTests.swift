@@ -2,6 +2,9 @@ import XCTest
 @testable import Recaply
 
 final class RecordViewModelTests: XCTestCase {
+    // `@MainActor` because `RecordViewModel` is main-actor-isolated; the assertions
+    // below are unchanged from the approved spec (idle → recording → stopping).
+    @MainActor
     func testIdleToRecordingToStopping() {
         let vm = RecordViewModel(recorder: StubRecorder())
         XCTAssertEqual(vm.phase, .idle)
