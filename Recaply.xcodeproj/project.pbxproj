@@ -21,6 +21,7 @@
 		D5119D29420C49D1E25D9AD2 /* SessionTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23670D7271693A50B21074D8 /* SessionTag.swift */; };
 		7310142B04896DC4B5D59C00 /* SummaryPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF926B0086F0F4BE70E8744 /* SummaryPayload.swift */; };
 		049D92AC2A8BE5B21AB6D597 /* TranscriptSegmentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */; };
+		877ACC8D64FC8D324D746CE5 /* RecordingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A463B016C1E1B3C027D4B983 /* RecordingService.swift */; };
 		13703A45F7E722622E632A64 /* Recaply.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */; };
 		179782633F55D14071133A6E /* RecaplyTestsPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */; };
 /* End PBXBuildFile section */
@@ -42,6 +43,7 @@
 		23670D7271693A50B21074D8 /* SessionTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionTag.swift"; sourceTree = "<group>"; };
 		7BF926B0086F0F4BE70E8744 /* SummaryPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SummaryPayload.swift"; sourceTree = "<group>"; };
 		900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TranscriptSegmentModel.swift"; sourceTree = "<group>"; };
+		A463B016C1E1B3C027D4B983 /* RecordingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordingService.swift"; sourceTree = "<group>"; };
 		56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Recaply.xcdatamodeld"; sourceTree = "<group>"; };
 		C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecaplyTestsPlaceholder.swift"; sourceTree = "<group>"; };
 		461A5A3F9FDD134BC064B0B7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 				010B52DACEEB65099EDB1910 /* Data */,
 				65DD32270524C04797A626F8 /* Extensions */,
 				5CDD99408C6E120803C9CFDD /* Models */,
+				8D82EFA3D0D2E373AF7DB1A7 /* Services */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -135,6 +138,14 @@
 				900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		8D82EFA3D0D2E373AF7DB1A7 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A463B016C1E1B3C027D4B983 /* RecordingService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		5CB925814CB9D325B98F666D /* Resources */ = {
@@ -191,6 +202,7 @@
 				D5119D29420C49D1E25D9AD2 /* SessionTag.swift in Sources */,
 				7310142B04896DC4B5D59C00 /* SummaryPayload.swift in Sources */,
 				049D92AC2A8BE5B21AB6D597 /* TranscriptSegmentModel.swift in Sources */,
+				877ACC8D64FC8D324D746CE5 /* RecordingService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
