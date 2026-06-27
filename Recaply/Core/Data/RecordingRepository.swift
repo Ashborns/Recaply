@@ -165,11 +165,10 @@ final class RecordingRepository {
         guard let text = object.value(forKey: "text") as? String else { return nil }
         let index = Int(object.value(forKey: "index") as? Int16 ?? 0)
         let labelRaw = object.value(forKey: "label") as? String ?? SentenceLabel.discussion.rawValue
-        let cleaned = object.value(forKey: "cleanedText") as? String
         return TranscriptSegmentModel(
             id: object.value(forKey: "id") as? UUID ?? UUID(),
             index: index,
-            text: cleaned ?? text,
+            text: text,
             timestamp: object.value(forKey: "timestamp") as? TimeInterval ?? 0,
             label: SentenceLabel(rawValue: labelRaw) ?? .discussion,
             confidence: object.value(forKey: "confidence") as? Double ?? 0
