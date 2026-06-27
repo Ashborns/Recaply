@@ -1,0 +1,23 @@
+# Brainstorm / visual-companion artifacts
+.superpowers/
+
+# macOS
+.DS_Store
+
+# Xcode / Swift build artifacts
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+.build/
+Package.resolved
+
+# CoreML training scratch (model is committed under Resources/Models)
+ml/__pycache__/
+*.pyc
