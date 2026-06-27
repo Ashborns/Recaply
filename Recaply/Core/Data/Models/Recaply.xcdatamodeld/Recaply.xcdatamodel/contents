@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="22G91" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Recording" representedClassName="Recording" syncable="YES" codeGenerationType="class">
+        <attribute name="audioURL" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="duration" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="status" attributeType="String" defaultValueString="captured"/>
+        <attribute name="tag" attributeType="String" defaultValueString="meeting"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="videoURL" optional="YES" attributeType="String"/>
+        <relationship name="enhanced" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="EnhancedTranscript" inverseName="recording" inverseEntity="EnhancedTranscript"/>
+        <relationship name="segments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TranscriptSegment" inverseName="recording" inverseEntity="TranscriptSegment"/>
+        <relationship name="summary" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Summary" inverseName="recording" inverseEntity="Summary"/>
+    </entity>
+    <entity name="TranscriptSegment" representedClassName="TranscriptSegment" syncable="YES" codeGenerationType="class">
+        <attribute name="cleanedText" optional="YES" attributeType="String"/>
+        <attribute name="confidence" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="index" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="label" attributeType="String" defaultValueString="discussion"/>
+        <attribute name="text" attributeType="String"/>
+        <attribute name="timestamp" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="recording" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recording" inverseName="segments" inverseEntity="Recording"/>
+    </entity>
+    <entity name="EnhancedTranscript" representedClassName="EnhancedTranscript" syncable="YES" codeGenerationType="class">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="polishedJSON" optional="YES" attributeType="String"/>
+        <relationship name="recording" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recording" inverseName="enhanced" inverseEntity="Recording"/>
+    </entity>
+    <entity name="Summary" representedClassName="Summary" syncable="YES" codeGenerationType="class">
+        <attribute name="actionItemsJSON" optional="YES" attributeType="String"/>
+        <attribute name="decisionsJSON" optional="YES" attributeType="String"/>
+        <attribute name="generatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="keyPointsJSON" optional="YES" attributeType="String"/>
+        <attribute name="overview" optional="YES" attributeType="String"/>
+        <relationship name="recording" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recording" inverseName="summary" inverseEntity="Recording"/>
+    </entity>
+</model>
