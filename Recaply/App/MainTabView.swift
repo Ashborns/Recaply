@@ -3,7 +3,7 @@ import SwiftUI
 struct MainTabView: View {
     var body: some View {
         TabView {
-            PlaceholderView("Record").tabItem { Label("Record", systemImage: "record.circle.fill") }
+            RecordView().tabItem { Label("Record", systemImage: "record.circle.fill") }
             PlaceholderView("Library").tabItem { Label("Library", systemImage: "books.vertical.fill") }
             PlaceholderView("Settings").tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
