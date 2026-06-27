@@ -5,7 +5,7 @@ struct MainTabView: View {
         TabView {
             RecordView().tabItem { Label("Record", systemImage: "record.circle.fill") }
             PlaceholderView("Library").tabItem { Label("Library", systemImage: "books.vertical.fill") }
-            PlaceholderView("Settings").tabItem { Label("Settings", systemImage: "gearshape.fill") }
+            SettingsView().tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
         .tint(.accentPurple)
         .toolbarBackground(.ultraThinMaterial, for: .tabBar)
