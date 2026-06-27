@@ -64,8 +64,11 @@ final class RecordingRepository {
     func saveEnhancement(_ payload: EnhancedTranscriptPayload, to recording: RecordingInfo) {
         context.performAndWait {
             guard let recordingObject = recordingObject(id: recording.id) else { return }
-            let cleanByIndex = Dictionary(uniqueKeysWithValues: payload.clean.map { ($0.index, $0.text) })
-            let segments = recordingObject.value(forKey: "segments") as? Set<NSManagedObject> ?? []
+            var cleanByIndex: [Int: String] = [:]
+            for clean in payload.clean {
+                cleanByIndex[clean.index] = clean.text
+            }
+            let segments = managedObjects(from: recordingObject.value(forKey: "segments"))
             for segment in segments {
                 let index = Int(segment.value(forKey: "index") as? Int16 ?? 0)
                 segment.setValue(cleanByIndex[index], forKey: "cleanedText")
@@ -110,7 +113,7 @@ final class RecordingRepository {
         var detail: RecordingDetailData?
         context.performAndWait {
             guard let recordingObject = recordingObject(id: id), let recording = readRecording(recordingObject) else { return }
-            let segmentObjects = (recordingObject.value(forKey: "segments") as? Set<NSManagedObject> ?? [])
+            let segmentObjects = managedObjects(from: recordingObject.value(forKey: "segments"))
                 .sorted { Int($0.value(forKey: "index") as? Int16 ?? 0) < Int($1.value(forKey: "index") as? Int16 ?? 0) }
             let segments = segmentObjects.compactMap(readSegment)
             let enhanced = readEnhanced(recordingObject.value(forKey: "enhanced") as? NSManagedObject, segmentObjects: segmentObjects)
@@ -196,6 +199,12 @@ final class RecordingRepository {
             decisions: decode(object.value(forKey: "decisionsJSON") as? String ?? "[]") ?? [],
             keyPoints: decode(object.value(forKey: "keyPointsJSON") as? String ?? "[]") ?? []
         )
+    }
+
+    private func managedObjects(from value: Any?) -> [NSManagedObject] {
+        if let set = value as? Set<NSManagedObject> { return Array(set) }
+        if let set = value as? NSSet { return set.compactMap { $0 as? NSManagedObject } }
+        return []
     }
 
     private func encode<T: Encodable>(_ value: T) -> String {
