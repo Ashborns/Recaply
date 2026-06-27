@@ -8,7 +8,9 @@ import UIKit
 /// and Processing screen attach at the marked hook instead of this placeholder.
 struct RecordView: View {
     @StateObject private var vm = RecordViewModel()
+    @StateObject private var pipeline = PipelineCoordinator()
     @State private var showSaved = false
+    @State private var processingRecording: RecordingInfo?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -72,8 +74,15 @@ struct RecordView: View {
         .animation(reduceMotion ? nil : .recaplySpring, value: showSaved)
         .animation(reduceMotion ? nil : .recaplySpring, value: vm.startError)
         .onChange(of: vm.lastRecording) { recording in
-            guard recording != nil else { return }
-            onCaptureSaved()
+            guard let recording else { return }
+            onCaptureSaved(recording)
+        }
+        .fullScreenCover(item: $processingRecording) { recording in
+            ProcessingStageView(coordinator: pipeline, recording: recording) { _ in
+                processingRecording = nil
+                showSaved = false
+                vm.acknowledgeCapture()
+            }
         }
         .onChange(of: vm.cameraOn) { turnedOn in
             guard turnedOn else { return }
@@ -173,18 +182,11 @@ struct RecordView: View {
         }
     }
 
-    /// Phase 1 placeholder reaction to a finished capture: flash a confirmation, then
-    /// let the presentation layer return the state machine to idle. Phase 5 replaces
-    /// the `acknowledgeCapture()` call with the pipeline run + Processing navigation.
-    private func onCaptureSaved() {
+    /// Phase 5 handoff: persist and process the finished capture in the full-screen
+    /// Processing view. Detail navigation is added by the Library/Detail phase.
+    private func onCaptureSaved(_ recording: RecordingInfo) {
         withAnimation(reduceMotion ? nil : .recaplySpring) { showSaved = true }
-        Task {
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
-            await MainActor.run {
-                withAnimation(reduceMotion ? nil : .recaplySpring) { showSaved = false }
-                vm.acknowledgeCapture()
-            }
-        }
+        processingRecording = recording
     }
 
     /// Distinguishes camera failures (authorization / configuration) from mic/engine

@@ -11,6 +11,7 @@
 		7D046DE1C8FF598D8F6E5AE5 /* RecaplyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8C7848FBB888E34FA6D1A7 /* RecaplyApp.swift */; };
 		8FF4450D310AE26CAC18CB56 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB80823FE425CBD5A1213E5 /* RootView.swift */; };
 		190D99D66D749CA9A0D6215C /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C323CA9EB32117049C3A974E /* PersistenceController.swift */; };
+		C56F4AD6D4FA9FA17D641B50 /* RecordingRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 644C7F70F145748E8C2CB299 /* RecordingRepository.swift */; };
 		584F5FA6AE6AC3F11EC4AC4D /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C65ACDD90850B8FB298542B8 /* Color+Theme.swift */; };
 		50731464937E14448C6B9631 /* Date+.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD5BB0AE5DAF55B61622554 /* Date+.swift */; };
 		80D5ED7D9CFE8014E8A54E8A /* TimeInterval+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA0D9E2325921E910F82147 /* TimeInterval+.swift */; };
@@ -27,10 +28,12 @@
 		30520800180DBCB6BABE9A22 /* DeepseekClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB5BD4E72DBFF5618FAEB08 /* DeepseekClient.swift */; };
 		D1C58AC5BA4E3B74EC657C11 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8563624D16F7E9A798478FD5 /* KeychainStore.swift */; };
 		FA4899F775191693CE1B118B /* LLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E202A23B336BC14C0B3D0D0 /* LLMClient.swift */; };
+		A7E53A0F32B06F49ADF3A002 /* PipelineCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EBC77D6AF6AF9DCF46CB2F /* PipelineCoordinator.swift */; };
 		877ACC8D64FC8D324D746CE5 /* RecordingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A463B016C1E1B3C027D4B983 /* RecordingService.swift */; };
 		6C9AD853B82EB5E960A2C9CB /* SummarizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 809A479957E998CEB13D0AE7 /* SummarizationService.swift */; };
 		BB9EA0C4D71534F348E5D865 /* TranscriptEnhancementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69A32A78F05E8766505550B /* TranscriptEnhancementService.swift */; };
 		F1640355595C3C1646C61726 /* TranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2404482CB894185B5103E77 /* TranscriptionService.swift */; };
+		79C75FA6C0F0F4F777E69F94 /* ProcessingStageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27BB2BA907CABC5CED114A1E /* ProcessingStageView.swift */; };
 		7DB5ADC34DA195AB15A6F5F9 /* RecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D84DCABFB8AAABA2FAEB87F3 /* RecordView.swift */; };
 		D29C8031F18919F35F8A080D /* RecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF9E5C29EE2F5A675869A3A /* RecordViewModel.swift */; };
 		AB2D7F0F232A5CA627A388AF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB653484C034B417478CF57 /* SettingsView.swift */; };
@@ -51,6 +54,7 @@
 		0F8C7848FBB888E34FA6D1A7 /* RecaplyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecaplyApp.swift"; sourceTree = "<group>"; };
 		3CB80823FE425CBD5A1213E5 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RootView.swift"; sourceTree = "<group>"; };
 		C323CA9EB32117049C3A974E /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersistenceController.swift"; sourceTree = "<group>"; };
+		644C7F70F145748E8C2CB299 /* RecordingRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordingRepository.swift"; sourceTree = "<group>"; };
 		C65ACDD90850B8FB298542B8 /* Color+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
 		ADD5BB0AE5DAF55B61622554 /* Date+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+.swift"; sourceTree = "<group>"; };
 		3CA0D9E2325921E910F82147 /* TimeInterval+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+.swift"; sourceTree = "<group>"; };
@@ -67,10 +71,12 @@
 		ECB5BD4E72DBFF5618FAEB08 /* DeepseekClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepseekClient.swift"; sourceTree = "<group>"; };
 		8563624D16F7E9A798478FD5 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainStore.swift"; sourceTree = "<group>"; };
 		7E202A23B336BC14C0B3D0D0 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LLMClient.swift"; sourceTree = "<group>"; };
+		F6EBC77D6AF6AF9DCF46CB2F /* PipelineCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PipelineCoordinator.swift"; sourceTree = "<group>"; };
 		A463B016C1E1B3C027D4B983 /* RecordingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordingService.swift"; sourceTree = "<group>"; };
 		809A479957E998CEB13D0AE7 /* SummarizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SummarizationService.swift"; sourceTree = "<group>"; };
 		D69A32A78F05E8766505550B /* TranscriptEnhancementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TranscriptEnhancementService.swift"; sourceTree = "<group>"; };
 		B2404482CB894185B5103E77 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TranscriptionService.swift"; sourceTree = "<group>"; };
+		27BB2BA907CABC5CED114A1E /* ProcessingStageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessingStageView.swift"; sourceTree = "<group>"; };
 		D84DCABFB8AAABA2FAEB87F3 /* RecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordView.swift"; sourceTree = "<group>"; };
 		4EF9E5C29EE2F5A675869A3A /* RecordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordViewModel.swift"; sourceTree = "<group>"; };
 		8FB653484C034B417478CF57 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
@@ -132,6 +138,7 @@
 				65DD32270524C04797A626F8 /* Extensions */,
 				5CDD99408C6E120803C9CFDD /* Models */,
 				8D82EFA3D0D2E373AF7DB1A7 /* Services */,
+				95AE745460296A16669333E9 /* UI */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -141,6 +148,7 @@
 			children = (
 				1F8C942843B1EC4A094D61A3 /* Models */,
 				C323CA9EB32117049C3A974E /* PersistenceController.swift */,
+				644C7F70F145748E8C2CB299 /* RecordingRepository.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -186,12 +194,21 @@
 				ECB5BD4E72DBFF5618FAEB08 /* DeepseekClient.swift */,
 				8563624D16F7E9A798478FD5 /* KeychainStore.swift */,
 				7E202A23B336BC14C0B3D0D0 /* LLMClient.swift */,
+				F6EBC77D6AF6AF9DCF46CB2F /* PipelineCoordinator.swift */,
 				A463B016C1E1B3C027D4B983 /* RecordingService.swift */,
 				809A479957E998CEB13D0AE7 /* SummarizationService.swift */,
 				D69A32A78F05E8766505550B /* TranscriptEnhancementService.swift */,
 				B2404482CB894185B5103E77 /* TranscriptionService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		95AE745460296A16669333E9 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				27BB2BA907CABC5CED114A1E /* ProcessingStageView.swift */,
+			);
+			path = UI;
 			sourceTree = "<group>";
 		};
 		5DC03ACB53DE45700BB4E9F0 /* Features */ = {
@@ -270,6 +287,7 @@
 				7D046DE1C8FF598D8F6E5AE5 /* RecaplyApp.swift in Sources */,
 				8FF4450D310AE26CAC18CB56 /* RootView.swift in Sources */,
 				190D99D66D749CA9A0D6215C /* PersistenceController.swift in Sources */,
+				C56F4AD6D4FA9FA17D641B50 /* RecordingRepository.swift in Sources */,
 				584F5FA6AE6AC3F11EC4AC4D /* Color+Theme.swift in Sources */,
 				50731464937E14448C6B9631 /* Date+.swift in Sources */,
 				80D5ED7D9CFE8014E8A54E8A /* TimeInterval+.swift in Sources */,
@@ -286,10 +304,12 @@
 				30520800180DBCB6BABE9A22 /* DeepseekClient.swift in Sources */,
 				D1C58AC5BA4E3B74EC657C11 /* KeychainStore.swift in Sources */,
 				FA4899F775191693CE1B118B /* LLMClient.swift in Sources */,
+				A7E53A0F32B06F49ADF3A002 /* PipelineCoordinator.swift in Sources */,
 				877ACC8D64FC8D324D746CE5 /* RecordingService.swift in Sources */,
 				6C9AD853B82EB5E960A2C9CB /* SummarizationService.swift in Sources */,
 				BB9EA0C4D71534F348E5D865 /* TranscriptEnhancementService.swift in Sources */,
 				F1640355595C3C1646C61726 /* TranscriptionService.swift in Sources */,
+				79C75FA6C0F0F4F777E69F94 /* ProcessingStageView.swift in Sources */,
 				7DB5ADC34DA195AB15A6F5F9 /* RecordView.swift in Sources */,
 				D29C8031F18919F35F8A080D /* RecordViewModel.swift in Sources */,
 				AB2D7F0F232A5CA627A388AF /* SettingsView.swift in Sources */,
