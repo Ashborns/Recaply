@@ -159,8 +159,8 @@ struct RecordView: View {
             vm.stop()
             // MARK: - Phase 5 hook
             // When the pipeline lands, this is where the Processing screen is presented
-            // and PipelineCoordinator.run(vm.lastRecording!) kicks off. For Phase 1 we
-            // fall through to the saved-confirmation handler below.
+            // and PipelineCoordinator.run(recording) kicks off (guarding lastRecording).
+            // For Phase 1 we fall through to the saved-confirmation handler below.
         case .stopping:
             break
         }

@@ -45,8 +45,8 @@ skill spesifik. Marker: ⬜ TODO · 🔄 IN PROGRESS · ✅ STABLE · ❌ BLOCKE
 | `Recaply.xcdatamodeld` (Recording/TranscriptSegment/EnhancedTranscript/Summary) | 0 | 🔄 IN PROGRESS |
 | Domain value types (`Core/Models/*`) | 0 | 🔄 IN PROGRESS |
 | App shell `RecaplyApp`/`RootView`/`MainTabView` | 0 | 🔄 IN PROGRESS |
-| `RecordingService` + `CameraService` + waveform | 1 | ⬜ TODO |
-| `Features/Record/*` (capture UI + ViewModel) | 1 | ⬜ TODO |
+| `RecordingService` + `CameraService` + waveform | 1 | 🔄 IN PROGRESS |
+| `Features/Record/*` (capture UI + ViewModel) | 1 | 🔄 IN PROGRESS |
 | `TranscriptionService` (SFSpeechRecognizer + restart) | 2 | ⬜ TODO |
 | `ClassificationService` + `ActionItemClassifier` + stub | 3 | ⬜ TODO |
 | `Resources/Models/ActionItemClassifier.mlmodel` (train di lab) | 3 | ⬜ TODO |
