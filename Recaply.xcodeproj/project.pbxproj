@@ -23,8 +23,10 @@
 		049D92AC2A8BE5B21AB6D597 /* TranscriptSegmentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */; };
 		CEBA8B8D94A3C77BDC251E9D /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4DF08E57C6D9C96C8705BE /* CameraService.swift */; };
 		877ACC8D64FC8D324D746CE5 /* RecordingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A463B016C1E1B3C027D4B983 /* RecordingService.swift */; };
+		D29C8031F18919F35F8A080D /* RecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF9E5C29EE2F5A675869A3A /* RecordViewModel.swift */; };
 		13703A45F7E722622E632A64 /* Recaply.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */; };
 		179782633F55D14071133A6E /* RecaplyTestsPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */; };
+		FFB405A883222D6DE42D220B /* RecordViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B4049CB72409F585A39A51 /* RecordViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,8 +48,10 @@
 		900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TranscriptSegmentModel.swift"; sourceTree = "<group>"; };
 		2B4DF08E57C6D9C96C8705BE /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CameraService.swift"; sourceTree = "<group>"; };
 		A463B016C1E1B3C027D4B983 /* RecordingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordingService.swift"; sourceTree = "<group>"; };
+		4EF9E5C29EE2F5A675869A3A /* RecordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordViewModel.swift"; sourceTree = "<group>"; };
 		56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Recaply.xcdatamodeld"; sourceTree = "<group>"; };
 		C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecaplyTestsPlaceholder.swift"; sourceTree = "<group>"; };
+		04B4049CB72409F585A39A51 /* RecordViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordViewModelTests.swift"; sourceTree = "<group>"; };
 		461A5A3F9FDD134BC064B0B7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,6 +79,7 @@
 			children = (
 				AC6545EDE5A39074A15E6244 /* App */,
 				0ADB5386121963586531221C /* Core */,
+				5DC03ACB53DE45700BB4E9F0 /* Features */,
 				5CB925814CB9D325B98F666D /* Resources */,
 			);
 			path = Recaply;
@@ -151,6 +156,22 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		5DC03ACB53DE45700BB4E9F0 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				BF497DA8893CB74362070B1C /* Record */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		BF497DA8893CB74362070B1C /* Record */ = {
+			isa = PBXGroup;
+			children = (
+				4EF9E5C29EE2F5A675869A3A /* RecordViewModel.swift */,
+			);
+			path = Record;
+			sourceTree = "<group>";
+		};
 		5CB925814CB9D325B98F666D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -163,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */,
+				04B4049CB72409F585A39A51 /* RecordViewModelTests.swift */,
 			);
 			path = RecaplyTests;
 			sourceTree = "<group>";
@@ -207,6 +229,7 @@
 				049D92AC2A8BE5B21AB6D597 /* TranscriptSegmentModel.swift in Sources */,
 				CEBA8B8D94A3C77BDC251E9D /* CameraService.swift in Sources */,
 				877ACC8D64FC8D324D746CE5 /* RecordingService.swift in Sources */,
+				D29C8031F18919F35F8A080D /* RecordViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,6 +238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				179782633F55D14071133A6E /* RecaplyTestsPlaceholder.swift in Sources */,
+				FFB405A883222D6DE42D220B /* RecordViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
