@@ -1,0 +1,478 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2835FE1D87325877ED0C91BB /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF39FAAEE096C5A70BB3AA2 /* MainTabView.swift */; };
+		7D046DE1C8FF598D8F6E5AE5 /* RecaplyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F8C7848FBB888E34FA6D1A7 /* RecaplyApp.swift */; };
+		8FF4450D310AE26CAC18CB56 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB80823FE425CBD5A1213E5 /* RootView.swift */; };
+		190D99D66D749CA9A0D6215C /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C323CA9EB32117049C3A974E /* PersistenceController.swift */; };
+		584F5FA6AE6AC3F11EC4AC4D /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C65ACDD90850B8FB298542B8 /* Color+Theme.swift */; };
+		50731464937E14448C6B9631 /* Date+.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD5BB0AE5DAF55B61622554 /* Date+.swift */; };
+		80D5ED7D9CFE8014E8A54E8A /* TimeInterval+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA0D9E2325921E910F82147 /* TimeInterval+.swift */; };
+		69E6CB2F7AE271BD6D125364 /* EnhancedTranscriptPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = A424634605CA5252072A4EB0 /* EnhancedTranscriptPayload.swift */; };
+		F9292B35ACAB1C314BAF1C96 /* PipelineStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4006DCCAD0CBBF4F9E12E344 /* PipelineStatus.swift */; };
+		A552DC880D868A300581C77E /* RecordingInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D0196ECABA2374F1AB8D0F /* RecordingInfo.swift */; };
+		63499445092DCD3FC47ECE2D /* SentenceLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB939C89541D613F49375673 /* SentenceLabel.swift */; };
+		D5119D29420C49D1E25D9AD2 /* SessionTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23670D7271693A50B21074D8 /* SessionTag.swift */; };
+		7310142B04896DC4B5D59C00 /* SummaryPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF926B0086F0F4BE70E8744 /* SummaryPayload.swift */; };
+		049D92AC2A8BE5B21AB6D597 /* TranscriptSegmentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */; };
+		13703A45F7E722622E632A64 /* Recaply.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */; };
+		179782633F55D14071133A6E /* RecaplyTestsPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A612554AFBDBB78BBE69496E /* Recaply.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recaply.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		05961EF902A712AD349F61A6 /* RecaplyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RecaplyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DF39FAAEE096C5A70BB3AA2 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainTabView.swift"; sourceTree = "<group>"; };
+		0F8C7848FBB888E34FA6D1A7 /* RecaplyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecaplyApp.swift"; sourceTree = "<group>"; };
+		3CB80823FE425CBD5A1213E5 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RootView.swift"; sourceTree = "<group>"; };
+		C323CA9EB32117049C3A974E /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersistenceController.swift"; sourceTree = "<group>"; };
+		C65ACDD90850B8FB298542B8 /* Color+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
+		ADD5BB0AE5DAF55B61622554 /* Date+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+.swift"; sourceTree = "<group>"; };
+		3CA0D9E2325921E910F82147 /* TimeInterval+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+.swift"; sourceTree = "<group>"; };
+		A424634605CA5252072A4EB0 /* EnhancedTranscriptPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EnhancedTranscriptPayload.swift"; sourceTree = "<group>"; };
+		4006DCCAD0CBBF4F9E12E344 /* PipelineStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PipelineStatus.swift"; sourceTree = "<group>"; };
+		94D0196ECABA2374F1AB8D0F /* RecordingInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecordingInfo.swift"; sourceTree = "<group>"; };
+		DB939C89541D613F49375673 /* SentenceLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SentenceLabel.swift"; sourceTree = "<group>"; };
+		23670D7271693A50B21074D8 /* SessionTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionTag.swift"; sourceTree = "<group>"; };
+		7BF926B0086F0F4BE70E8744 /* SummaryPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SummaryPayload.swift"; sourceTree = "<group>"; };
+		900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TranscriptSegmentModel.swift"; sourceTree = "<group>"; };
+		56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Recaply.xcdatamodeld"; sourceTree = "<group>"; };
+		C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecaplyTestsPlaceholder.swift"; sourceTree = "<group>"; };
+		461A5A3F9FDD134BC064B0B7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2A44C54E23411059C3A1A1E1 = {
+			isa = PBXGroup;
+			children = (
+				44D298590D490897369FD401 /* Recaply */,
+				997A1CCDE84C340F67A728AA /* RecaplyTests */,
+				433D647A17039DC680DEAE8F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		433D647A17039DC680DEAE8F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A612554AFBDBB78BBE69496E /* Recaply.app */,
+				05961EF902A712AD349F61A6 /* RecaplyTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		44D298590D490897369FD401 /* Recaply */ = {
+			isa = PBXGroup;
+			children = (
+				AC6545EDE5A39074A15E6244 /* App */,
+				0ADB5386121963586531221C /* Core */,
+				5CB925814CB9D325B98F666D /* Resources */,
+			);
+			path = Recaply;
+			sourceTree = "<group>";
+		};
+		AC6545EDE5A39074A15E6244 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				8DF39FAAEE096C5A70BB3AA2 /* MainTabView.swift */,
+				0F8C7848FBB888E34FA6D1A7 /* RecaplyApp.swift */,
+				3CB80823FE425CBD5A1213E5 /* RootView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		0ADB5386121963586531221C /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				010B52DACEEB65099EDB1910 /* Data */,
+				65DD32270524C04797A626F8 /* Extensions */,
+				5CDD99408C6E120803C9CFDD /* Models */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		010B52DACEEB65099EDB1910 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				1F8C942843B1EC4A094D61A3 /* Models */,
+				C323CA9EB32117049C3A974E /* PersistenceController.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		1F8C942843B1EC4A094D61A3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				56632B8AF9C79A29A38073E1 /* Recaply.xcdatamodeld */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		65DD32270524C04797A626F8 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				C65ACDD90850B8FB298542B8 /* Color+Theme.swift */,
+				ADD5BB0AE5DAF55B61622554 /* Date+.swift */,
+				3CA0D9E2325921E910F82147 /* TimeInterval+.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		5CDD99408C6E120803C9CFDD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A424634605CA5252072A4EB0 /* EnhancedTranscriptPayload.swift */,
+				4006DCCAD0CBBF4F9E12E344 /* PipelineStatus.swift */,
+				94D0196ECABA2374F1AB8D0F /* RecordingInfo.swift */,
+				DB939C89541D613F49375673 /* SentenceLabel.swift */,
+				23670D7271693A50B21074D8 /* SessionTag.swift */,
+				7BF926B0086F0F4BE70E8744 /* SummaryPayload.swift */,
+				900354AD382FEE2A361CAE8C /* TranscriptSegmentModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5CB925814CB9D325B98F666D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				461A5A3F9FDD134BC064B0B7 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		997A1CCDE84C340F67A728AA /* RecaplyTests */ = {
+			isa = PBXGroup;
+			children = (
+				C0088E22ABF307B60A608CFA /* RecaplyTestsPlaceholder.swift */,
+			);
+			path = RecaplyTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		349B578E88FC623128D2018B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1320E2AF4EB675E74612E0CC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F3F3D267CF0FD5307403D537 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2835FE1D87325877ED0C91BB /* MainTabView.swift in Sources */,
+				7D046DE1C8FF598D8F6E5AE5 /* RecaplyApp.swift in Sources */,
+				8FF4450D310AE26CAC18CB56 /* RootView.swift in Sources */,
+				190D99D66D749CA9A0D6215C /* PersistenceController.swift in Sources */,
+				584F5FA6AE6AC3F11EC4AC4D /* Color+Theme.swift in Sources */,
+				50731464937E14448C6B9631 /* Date+.swift in Sources */,
+				80D5ED7D9CFE8014E8A54E8A /* TimeInterval+.swift in Sources */,
+				69E6CB2F7AE271BD6D125364 /* EnhancedTranscriptPayload.swift in Sources */,
+				F9292B35ACAB1C314BAF1C96 /* PipelineStatus.swift in Sources */,
+				A552DC880D868A300581C77E /* RecordingInfo.swift in Sources */,
+				63499445092DCD3FC47ECE2D /* SentenceLabel.swift in Sources */,
+				D5119D29420C49D1E25D9AD2 /* SessionTag.swift in Sources */,
+				7310142B04896DC4B5D59C00 /* SummaryPayload.swift in Sources */,
+				049D92AC2A8BE5B21AB6D597 /* TranscriptSegmentModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5F12ADC3386F4509A077E35D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				179782633F55D14071133A6E /* RecaplyTestsPlaceholder.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		41B260B1D2A5E0B273280C8E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				13703A45F7E722622E632A64 /* Recaply.xcdatamodeld in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EBF2900ABE3D53E63B136430 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		42AEFBAE01D2DFD981F7DA7D /* Recaply */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5C44F80C1B437B91DA0BB937 /* Build configuration list for PBXNativeTarget "Recaply" */;
+			buildPhases = (
+				F3F3D267CF0FD5307403D537 /* Sources */,
+				349B578E88FC623128D2018B /* Frameworks */,
+				41B260B1D2A5E0B273280C8E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Recaply;
+			productName = Recaply;
+			productReference = A612554AFBDBB78BBE69496E /* Recaply.app */;
+			productType = "com.apple.product-type.application";
+		};
+		124C588D1E4E0F457FAD7DFF /* RecaplyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC852C050BF22BD6AAF6AB81 /* Build configuration list for PBXNativeTarget "RecaplyTests" */;
+			buildPhases = (
+				5F12ADC3386F4509A077E35D /* Sources */,
+				1320E2AF4EB675E74612E0CC /* Frameworks */,
+				EBF2900ABE3D53E63B136430 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				29F1A6E5C69C14DA8F71EF92 /* PBXTargetDependency */,
+			);
+			name = RecaplyTests;
+			productName = RecaplyTests;
+			productReference = 05961EF902A712AD349F61A6 /* RecaplyTests.xctest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		83E4BB5F4F75BB6C6C50D8B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 42AEFBAE01D2DFD981F7DA7D;
+			remoteInfo = Recaply;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		29F1A6E5C69C14DA8F71EF92 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 42AEFBAE01D2DFD981F7DA7D /* Recaply */;
+			targetProxy = 83E4BB5F4F75BB6C6C50D8B3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		E08BCFCC59AFC6E15F6A20D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+			};
+			name = Debug;
+		};
+		38969EF9FFB2CF99760A6D48 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CE044FC0A29067D21D0E8008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Recaply/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.edu.njxzc.Recaply;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		ADFB50D78F93CDDA2FE375B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Recaply/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.edu.njxzc.Recaply;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4319068914E9AD951450F772 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.edu.njxzc.RecaplyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Recaply.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Recaply";
+			};
+			name = Debug;
+		};
+		CED743B8F690BE35A49861D8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.edu.njxzc.RecaplyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Recaply.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Recaply";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F420864495A37F85B2E8CB2D /* Build configuration list for PBXProject */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E08BCFCC59AFC6E15F6A20D3 /* Debug */,
+				38969EF9FFB2CF99760A6D48 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5C44F80C1B437B91DA0BB937 /* Build configuration list for PBXNativeTarget "Recaply" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE044FC0A29067D21D0E8008 /* Debug */,
+				ADFB50D78F93CDDA2FE375B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC852C050BF22BD6AAF6AB81 /* Build configuration list for PBXNativeTarget "RecaplyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4319068914E9AD951450F772 /* Debug */,
+				CED743B8F690BE35A49861D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					42AEFBAE01D2DFD981F7DA7D = {
+						CreatedOnToolsVersion = 14.3;
+					};
+					124C588D1E4E0F457FAD7DFF = {
+						CreatedOnToolsVersion = 14.3;
+						TestTargetID = 42AEFBAE01D2DFD981F7DA7D /* Recaply */;
+					};
+				};
+			};
+			buildConfigurationList = F420864495A37F85B2E8CB2D /* Build configuration list for PBXProject */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2A44C54E23411059C3A1A1E1;
+			productRefGroup = 433D647A17039DC680DEAE8F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				42AEFBAE01D2DFD981F7DA7D /* Recaply */,
+				124C588D1E4E0F457FAD7DFF /* RecaplyTests */,
+			);
+		};
+/* End PBXProject section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}
