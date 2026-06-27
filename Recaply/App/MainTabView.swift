@@ -4,7 +4,7 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             RecordView().tabItem { Label("Record", systemImage: "record.circle.fill") }
-            PlaceholderView("Library").tabItem { Label("Library", systemImage: "books.vertical.fill") }
+            LibraryView().tabItem { Label("Library", systemImage: "books.vertical.fill") }
             SettingsView().tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
         .tint(.accentPurple)
