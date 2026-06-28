@@ -56,19 +56,20 @@ final class RecordViewModel: ObservableObject {
         self.recordingStartedAt = Date()
 
         if let recordingService = recorder as? RecordingService {
-            let liveReady = await liveTranscriber.start(locale: RecaplySpeechLanguage.selected.primaryLocale)
+            let speechLanguage = RecaplySpeechLanguage.selected
+            let liveReady = await liveTranscriber.start(locales: speechLanguage.recognitionLocales)
             if liveReady {
                 liveTranscriber.onTranscript = { [weak self] text in
                     Task { @MainActor [weak self] in
                         self?.liveTranscript = text
-                        self?.liveCaptionStatus = "Live transcript"
+                        self?.liveCaptionStatus = "Live transcript · \(speechLanguage.title)"
                     }
                 }
                 recordingService.setAudioBufferConsumer { [weak liveTranscriber] buffer in
                     liveTranscriber?.append(buffer)
                 }
             } else {
-                liveCaptionStatus = "Live captions unavailable; final transcript still runs after stop."
+                liveCaptionStatus = "Live captions unavailable for this language/device; final transcript still runs after stop."
                 recordingService.setAudioBufferConsumer(nil)
             }
         } else {
@@ -93,6 +94,11 @@ final class RecordViewModel: ObservableObject {
                 guard let self else { return }
                 self.level = self.recorder.currentLevel
                 self.elapsed = Date().timeIntervalSince(self.recordingStartedAt ?? Date())
+                if self.phase == .recording, self.liveTranscript.isEmpty {
+                    self.liveCaptionStatus = self.level > 0.08
+                        ? "Speech detected… waiting for live transcript"
+                        : "Listening for speech…"
+                }
             }
         }
         RunLoop.main.add(timer, forMode: .common)

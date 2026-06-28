@@ -17,23 +17,31 @@ final class LiveTranscriptionService {
     private var rotationWorkItem: DispatchWorkItem?
     private var taskGeneration = 0
     private let appendQueue = DispatchQueue(label: "recaply.live-transcription")
-    private let rotationInterval: TimeInterval = 45
+    private let rotationInterval: TimeInterval = 55
 
     private init() {}
 
     func start(locale: Locale = Locale(identifier: "id-ID")) async -> Bool {
+        await start(locales: [locale])
+    }
+
+    func start(locales: [Locale]) async -> Bool {
         stop()
         let authorized = await TranscriptionService.shared.requestAuthorization()
         guard authorized else { return false }
 
-        guard let recognizer = SFSpeechRecognizer(locale: locale), recognizer.isAvailable else {
+        let candidates = locales.isEmpty ? [Locale(identifier: "id-ID"), Locale(identifier: "en-US")] : locales
+        guard let selected = candidates.compactMap({ locale -> (Locale, SFSpeechRecognizer)? in
+            guard let recognizer = SFSpeechRecognizer(locale: locale), recognizer.isAvailable else { return nil }
+            return (locale, recognizer)
+        }).first else {
             return false
         }
 
-        self.locale = locale
+        self.locale = selected.0
         let request = SFSpeechAudioBufferRecognitionRequest()
         configure(request)
-        self.recognizer = recognizer
+        self.recognizer = selected.1
         self.request = request
         self.isRunning = true
         self.committedTranscript = ""
@@ -44,9 +52,7 @@ final class LiveTranscriptionService {
     }
 
     func append(_ buffer: AVAudioPCMBuffer) {
-        appendQueue.async { [weak self] in
-            self?.request?.append(buffer)
-        }
+        request?.append(buffer)
     }
 
     func stop() {
