@@ -237,7 +237,7 @@ struct RecordingDetailView: View {
                     }
                 }
 
-                Text("Try again when your connection/API keys are available. Recaply will use GLM first, then Groq. No local fallback recap will be generated.")
+                Text("Try again when your connection/API keys are available. Recaply will use Groq first, then GLM / Z.ai. No local fallback recap will be generated.")
                     .font(.footnote)
                     .foregroundColor(.textSecondary)
 

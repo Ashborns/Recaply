@@ -6,7 +6,7 @@ final class TranscriptEnhancementService {
     private let primary: LLMProviding
     private let fallback: LLMProviding?
 
-    init(primary: LLMProviding = LLMClient.shared, fallback: LLMProviding? = GroqLLMClient.shared) {
+    init(primary: LLMProviding = GroqLLMClient.shared, fallback: LLMProviding? = LLMClient.shared) {
         self.primary = primary
         self.fallback = fallback
     }

@@ -49,11 +49,11 @@ final class SettingsViewModel: ObservableObject {
     var aiEngineDescription: String {
         switch (isGLMConfigured, isGroqConfigured) {
         case (true, true):
-            return "Primary GLM / Z.ai · \(glmModelName) · fallback Groq · \(groqModelName)"
+            return "Primary Groq · \(groqModelName) · fallback GLM / Z.ai · \(glmModelName)"
         case (true, false):
-            return "Connected to GLM / Z.ai · \(glmModelName)"
+            return "Groq missing; GLM / Z.ai fallback available · \(glmModelName)"
         case (false, true):
-            return "Primary offline unavailable; Groq fallback ready · \(groqModelName)"
+            return "Primary Groq ready · \(groqModelName)"
         case (false, false):
             return "Offline fallback is active."
         }
@@ -64,7 +64,7 @@ final class SettingsViewModel: ObservableObject {
             diagnostic(
                 id: "glm",
                 name: "GLM / Z.ai",
-                role: "Primary AI",
+                role: "Fallback AI",
                 keychainKey: "glm_key",
                 environmentKey: "GLM_API_KEY",
                 modelName: glmModelName
@@ -72,7 +72,7 @@ final class SettingsViewModel: ObservableObject {
             diagnostic(
                 id: "groq",
                 name: "Groq",
-                role: "Fallback AI",
+                role: "Primary AI",
                 keychainKey: "groq_key",
                 environmentKey: "GROQ_API_KEY",
                 modelName: groqModelName

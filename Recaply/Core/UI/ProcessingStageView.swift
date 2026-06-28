@@ -462,7 +462,7 @@ struct ProcessingStageView: View {
             return warning
         }
         if coordinator.activeStage == .enhancing || coordinator.activeStage == .summarizing {
-            return "Recaply is trying GLM / Z.ai first. If it fails, Groq is used next, then local fallback keeps the recap usable."
+            return "Recaply is trying Groq first. If it fails, GLM / Z.ai is used next. No local fallback recap will be generated."
         }
         return "Transcription and classification prepare the recording before AI enhancement starts."
     }
